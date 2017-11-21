@@ -1,14 +1,13 @@
-from concurrent import futures
-from collections import deque
 import time
 import grpc
 import masterslave_pb2
 import masterslave_pb2_grpc
 import sys
 import pymongo
+import logging
 from pymongo import MongoClient
-
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+from concurrent import futures
+from collections import deque
 
 if (len(sys.argv) != 3):
     print("usage: python master.py host port")
@@ -16,6 +15,14 @@ if (len(sys.argv) != 3):
 
 host = sys.argv[1]
 port = int(sys.argv[2])
+
+FORMAT = '%(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.info("Master is launching")
+
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 client = MongoClient(host, port)
 db = client['scheduler']
@@ -32,6 +39,7 @@ class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
         id = task['_id']
         task['host'] = request.slaveid
         db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
+        logger.info("Master is placing task %s on slave", task['taskname'])
         return masterslave_pb2.TaskResponse(taskname=task['taskname'],sleeptime=task['sleeptime'])
     
     def SendStatus(self, request, context):
