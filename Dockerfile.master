@@ -1,0 +1,10 @@
+FROM python:3
+
+RUN python -m pip install pymongo
+RUN python -m pip install grpcio
+
+COPY master.py /opt/scheduler/
+COPY masterslave_pb2.py /opt/scheduler/
+COPY masterslave_pb2_grpc.py /opt/scheduler
+
+

@@ -1,0 +1,9 @@
+FROM python:3
+
+RUN python -m pip install grpcio
+
+COPY slave.py /opt/scheduler/
+COPY masterslave_pb2.py /opt/scheduler/
+COPY masterslave_pb2_grpc.py /opt/scheduler
+
+
