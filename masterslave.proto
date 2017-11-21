@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+service TaskScheduler {
+  rpc SendTask(TaskRequest) returns (TaskResponse) {}	
+}
+
+message TaskRequest {
+  string slaveid = 1;
+}
+
+message TaskResponse {
+  string taskname = 1;
+  int32 sleeptime = 2;
+  
+}
+
