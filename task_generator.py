@@ -8,9 +8,9 @@ import sys
 from pymongo import MongoClient
 from random import randint
 
-NUM_TASKS = 100
+NUM_TASKS = 5
 TASK_NAME_LENGTH = 32
-MAX_TASK_DURATION_IN_SECS = 60
+MAX_TASK_DURATION_IN_SECS = 10
 
 if (len(sys.argv) != 3):
     print("usage: python task_generator.py host port")
