@@ -60,7 +60,6 @@ def run_slave_containers(num_containers):
         run_slave_container()
 
 def kill_random_slave_container():
-    print("kill random slave")
     num_containers = len(slave_idx_to_container)
     counter = randint(0, num_containers-1)
     for idx, container in slave_idx_to_container.items():
@@ -69,9 +68,7 @@ def kill_random_slave_container():
             call(cmd, shell=True)
             slave_idx_to_container.pop(idx)
             host = "slave-" + str(idx)
-            print(host)
             for task in db.tasks.find({"host": host, "state": "running"}):
-                print(task)
                 id = task['_id']
                 task['state'] = "killed"
                 db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
@@ -79,11 +76,10 @@ def kill_random_slave_container():
         counter -= 1
 
 def kill_master_container():
-    print("killing master container")
     cmd = f"sudo docker rm -f {master_container}"
     call(cmd, shell=True)
-    # all slaves  will die due to channel failure with master so mark these tasks as failed
-    # all tasks will either be in success, killed, or created state
+    # all slaves will die due to channel failure with master so mark these tasks as failed
+    # all tasks should either be in success, killed, or created state
     for task in db.tasks.find({"state": "running"}):
         id = task['_id']
         task['state'] = "killed"
@@ -91,23 +87,20 @@ def kill_master_container():
 
 def restart_after_killing_master_container():
     run_master_container()
-    run_slave_containers(MAX_SLAVE_CONTAINERS)
+    run_slave_container()
         
 if __name__ == '__main__':
     run_mongodb_container()
     run_task_generator()
-
     run_master_container()
     run_slave_containers(MAX_SLAVE_CONTAINERS)
     time.sleep(5)
     kill_master_container()
     time.sleep(10)
     restart_after_killing_master_container()
-
-    """
     kill_random_slave_container()
     time.sleep(5)
     kill_random_slave_container()
     time.sleep(5)
     run_slave_container()
-    """
+

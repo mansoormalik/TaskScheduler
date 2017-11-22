@@ -1,5 +1,5 @@
 run:
-	@sh setup.sh
+	@python driver.py
 
 build:
 	@sh grpc.sh
