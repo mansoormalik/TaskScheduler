@@ -10,12 +10,12 @@ The docker_build.sh script can be invoked to build the images for the master and
 
 Driver
 -------------------------
-The driver.py program is used to launch container images and does assists in testing by killing slave or master containers.
+The driver.py program is used to launch container images and assists in testing by killing slave or master containers.
 
 
 Inserting Tasks
 -------------------------
-The task_generator file is used to insert tasks into a mongodb instance.
+The task_generator.py program is used to insert tasks into a mongodb instance.
 
 
 Interprocess Communication
@@ -25,9 +25,9 @@ The master and slave communicate using gRPC. This provides a low-latency mechani
 Master
 --------------------
 The master application is in master.py. The master node:
-(a) does not start or stop slave nodes
-(b) does not keep state related to slave nodes
-(c) no explicit join or leave protocol is used
+1. does not start or stop slave nodes
+2. does not keep state related to slave nodes (state is captured in task structure via association of a task to a host) 
+3. no explicit join or leave protocol is used
 
 Slave
 --------------------
@@ -37,14 +37,14 @@ Joining or Leaving Cluster
 -----------------------------
 The slave nodes do not send an explicit join or leave message to the master node. The slave nodes are provided with the IP address and port of the master node. The slave nodes communicate with the master node using a wire protocol (gRPC).
 
-The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to the slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed to devise a protocol where slaves would need to notify the master when they were joining or leaving a cluster.
+The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed to devise a protocol where slaves would need to notify the master when they were joining or leaving a cluster.
 
 
 Load Balancing
 ---------------
-The number of tasks exceeds the number of slaves and the tasks are of different duration. The tasks are of equal priority. There is no interdependency between tasks and here is no requirement to schedule tasks based on their expected duration. We consider two options for distributing tasks:
-Option 1: Master assigns tasks to slaves
-Option 2: Slaves request tasks from master
+The number of tasks exceeds the number of slaves and the tasks are of different duration. The tasks are of equal priority. There is no interdependency between tasks and there is no requirement to schedule tasks based on their expected duration. We consider two options for distributing tasks:
+1. Master assigns tasks to slaves
+2. Slaves request tasks from master
 
 The second option was selected due to its simplicity and the time constraints for implementing the system.
 
@@ -56,8 +56,8 @@ In our system, the state of a task changes from created to running. The state ca
 Master Failure and Recovery
 ----------------------------
 Upon recovery, the master retrieves from the mongodb:
-(a) all unassigned tasks (state="created")
-(b) all killed tasks (state="killed")
+1. all unassigned tasks (state="created")
+2. all killed tasks (state="killed")
 These tasks are then reassiged to slaves.
 
 At present, our implementation relies on the following workaround to handle the case of tasks in a "running" state when a master dies. These tasks are also marked as "killed". This is non-optimal as the tasks will have to be redone. But the scheme works and ensures that all tasks in the work queue are eventually completed. Given more time a more efficient scheme would have been implemented to ensure that these tasks do not have to be done a second time.
