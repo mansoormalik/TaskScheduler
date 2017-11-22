@@ -1,4 +1,7 @@
-all:
+run:
+	@sh setup.sh
+
+build:
 	@sh grpc.sh
 
 clean:
