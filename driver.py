@@ -77,14 +77,37 @@ def kill_random_slave_container():
                 db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
             return
         counter -= 1
+
+def kill_master_container():
+    print("killing master container")
+    cmd = f"sudo docker rm -f {master_container}"
+    call(cmd, shell=True)
+    # all slaves  will die due to channel failure with master so mark these tasks as failed
+    # all tasks will either be in success, killed, or created state
+    for task in db.tasks.find({"state": "running"}):
+        id = task['_id']
+        task['state'] = "killed"
+        db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
+
+def restart_after_killing_master_container():
+    run_master_container()
+    run_slave_containers(MAX_SLAVE_CONTAINERS)
         
 if __name__ == '__main__':
     run_mongodb_container()
     run_task_generator()
+
     run_master_container()
     run_slave_containers(MAX_SLAVE_CONTAINERS)
     time.sleep(5)
-    kill_random_slave_container()
-    
-#call("sudo docker stop " + mongo_container, shell=True)
+    kill_master_container()
+    time.sleep(10)
+    restart_after_killing_master_container()
 
+    """
+    kill_random_slave_container()
+    time.sleep(5)
+    kill_random_slave_container()
+    time.sleep(5)
+    run_slave_container()
+    """
