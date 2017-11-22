@@ -26,24 +26,27 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 client = MongoClient(host, port)
 db = client['scheduler']
-tasks = {}
-queue = deque()
-    
+unassigned_taskname_to_task = {}
+unassigned_tasks = deque()
+
 for task in db.tasks.find({}):
-    tasks[task['taskname']] = task
-    queue.append(task)
+    unassigned_taskname_to_task[task['taskname']] = task
+    unassigned_tasks.append(task)
 
 class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
     def SendTask(self, request, context):
-        task = queue.pop()
-        id = task['_id']
-        task['host'] = request.slaveid
-        db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
-        logger.info("Master is placing task %s on slave", task['taskname'])
-        return masterslave_pb2.TaskResponse(taskname=task['taskname'],sleeptime=task['sleeptime'])
+        if (len(unassigned_tasks) > 0):
+            task = unassigned_tasks.pop()
+            id = task['_id']
+            task['host'] = request.slaveid
+            db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
+            logger.info("Master is placing task %s on slave", task['taskname'])
+            return masterslave_pb2.TaskResponse(taskname=task['taskname'], sleeptime=task['sleeptime'])
+        else:
+            return masterslave_pb2.TaskResponse(taskname="", sleeptime=0)
     
     def SendStatus(self, request, context):
-        task = tasks[request.taskname]
+        task = unassigned_taskname_to_task[request.taskname]
         id = task['_id']
         task['state'] = 'success'
         db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
