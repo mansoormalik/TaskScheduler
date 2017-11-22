@@ -51,9 +51,9 @@ The second option was selected due to its simplicity and the time constraints fo
 
 State Synchronization
 ----------------------
-In our system, the state of a task changes from created to running. The state can then change again to either killed or success. In addition, the task has a host assigned to it. This will change as a slave is assigned to execute a task. It may need to be changed again if a slave fails and the task needs to be reassigned to another slave. Since either the master or one or more slaves can fail, the mongodb is used to ensure that the system is in a consistent state.
+In our system, the state of a task changes from "created" to "running" when it is assigned to a slave. The state can then change again to either "killed" or "success". In addition, the task has a host assigned to it. For an unassigned task this field is empty. This will be updated once a slave is assigned to execute a task. It may need to be changed again if a slave dies and the task needs to be reassigned to another slave. Since either the master or one or more slaves can fail, the mongodb is used to ensure that the system is in a consistent state.
 
-Master Failure and Recovery
+Failure and Recovery
 ----------------------------
 Upon recovery, the master retrieves from the mongodb:
 1. all unassigned tasks (state="created")
