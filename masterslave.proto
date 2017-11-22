@@ -1,8 +1,8 @@
 syntax = "proto3";
 
 service TaskScheduler {
-  rpc SendTask(TaskRequest) returns (TaskResponse) {}
-  rpc SendStatus(StatusRequest) returns (StatusResponse) {}
+  rpc Task(TaskRequest) returns (TaskResponse) {}
+  rpc Status(StatusRequest) returns (StatusResponse) {}
 }
 
 message TaskRequest {
@@ -20,5 +20,5 @@ message StatusRequest {
 }
 
 message StatusResponse {
-  string taskname = 1;
+  
 }
