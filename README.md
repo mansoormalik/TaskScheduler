@@ -2,9 +2,9 @@
 
 Docker Images
 -------------------------
-(1) mongodb: the mongodb docker image is pulled from dockerhub
-(2) master: the Dockerfile.master is used to build an image for the master
-(3) slave: the Dockerfile.slave is used to build an image for the slave
+1. mongodb: the mongodb docker image is pulled from dockerhub
+2. master: the Dockerfile.master is used to build an image for the master
+3. slave: the Dockerfile.slave is used to build an image for the slave
 
 The docker_build.sh script can be invoked to build the images for the master and slave.
 
