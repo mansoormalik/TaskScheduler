@@ -20,5 +20,4 @@ message StatusRequest {
 }
 
 message StatusResponse {
-  
 }
