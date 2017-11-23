@@ -6,7 +6,9 @@ from subprocess import call
 from subprocess import check_output
 from pymongo import MongoClient
 from random import randint
+from fluent import sender
 
+node_id = "driver"
 mongo_container = ""
 mongo_host = ""
 mongo_port = 27017
@@ -17,6 +19,9 @@ MAX_SLAVE_CONTAINERS = 4
 next_slave_idx = 0
 mongo_client = None
 db = None
+
+logger = sender.FluentSender("scheduler", host="172.17.0.2", port=24224)
+logger.emit(node_id,{"message":"driver is starting"})
 
 def run_mongodb_container():
     global mongo_container
@@ -69,14 +74,17 @@ def kill_random_slave_container():
             call(cmd, shell=True)
             slave_idx_to_container.pop(idx)
             host = "slave-" + str(idx)
+            logger.emit(node_id,{"message":f"killing {host}"})
             for task in db.tasks.find({"host": host, "state": "running"}):
                 id = task['_id']
                 task['state'] = "killed"
+                logger.emit(node_id,{"message":f"changing status of task {id} to killed"})
                 db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
             return
         counter -= 1
 
 def kill_master_container():
+    logger.emit(node_id,{"message":"killing master"})
     cmd = f"sudo docker rm -f {master_container}"
     call(cmd, shell=True)
     # all slaves will die due to channel failure with master so mark these tasks as failed
@@ -84,17 +92,36 @@ def kill_master_container():
     for task in db.tasks.find({"state": "running"}):
         id = task['_id']
         task['state'] = "killed"
+        logger.emit(node_id,{"message":f"changing status of task {id} to killed"})
         db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
 
 def restart_after_killing_master_container():
     run_master_container()
-    run_slave_container()
-        
+    run_slave_containers(MAX_SLAVE_CONTAINERS)
+
+def enter_testing_loop():
+    counter = 0
+    while True:
+        if (counter % 4 == 0):
+            kill_master_container()
+            time.sleep(30)
+            restart_after_killing_master_container()
+            time.sleep(30)
+        else:
+            kill_random_slave_container()
+            time.sleep(30)
+            run_slave_container()
+            time.sleep(30)
+        counter += 1    
+
 if __name__ == '__main__':
     run_mongodb_container()
     run_task_generator()
     run_master_container()
     run_slave_containers(MAX_SLAVE_CONTAINERS)
+    time.sleep(60)
+    enter_testing_loop()
+    """
     sys.exit(0)
     time.sleep(5)
     kill_master_container()
@@ -105,4 +132,5 @@ if __name__ == '__main__':
     kill_random_slave_container()
     time.sleep(5)
     run_slave_container()
+    """
 
