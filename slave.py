@@ -1,7 +1,6 @@
 from __future__ import print_function
 import grpc
 import time
-#import logging
 import sys
 import masterslave_pb2
 import masterslave_pb2_grpc
