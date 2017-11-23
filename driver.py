@@ -32,6 +32,8 @@ def run_mongodb_container():
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     mongo_container = check_output(cmd, shell=True).strip().decode()
+    logger.emit(node_id,{"message":"launched mongod container",
+                         "container_id":f"{mongo_container}"})
     cmd = "sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + mongo_container
     mongo_host = check_output(cmd, shell=True).strip().decode()
     mongo_client = MongoClient(mongo_host, mongo_port)
@@ -48,6 +50,8 @@ def run_master_container():
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     master_container = check_output(cmd, shell=True).strip().decode()
+    logger.emit(node_id,{"message":"launched master container",
+                         "container_id":f"{master_container}"})
     cmd = "sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + master_container
     master_host = check_output(cmd, shell=True).strip().decode()
 
@@ -57,6 +61,8 @@ def run_slave_container():
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     container = check_output(cmd, shell=True).strip().decode()
+    logger.emit(node_id,{"message":f"launched slave-{next_slave_idx} container",
+                         "container_id":f"{container}"})
     slave_idx_to_container[next_slave_idx] = container
     next_slave_idx += 1
 
@@ -65,6 +71,15 @@ def run_slave_containers(num_containers):
     for idx in range(0, num_containers):
         run_slave_container()
 
+def send_tasks_summary_to_log():
+    created = db.tasks.count({"state":"created"})
+    running = db.tasks.count({"state":"running"})
+    killed = db.tasks.count({"state":"killed"})
+    success = db.tasks.count({"state":"success"})
+    logger.emit(node_id,{"message":"tasks summary", "created":f"{created}",
+                         "running":f"{running}", "killed":f"{killed}",
+                         "success":f"{success}"})
+        
 def kill_random_slave_container():
     num_containers = len(slave_idx_to_container)
     counter = randint(0, num_containers-1)
@@ -77,8 +92,9 @@ def kill_random_slave_container():
             logger.emit(node_id,{"message":f"killing {host}"})
             for task in db.tasks.find({"host": host, "state": "running"}):
                 id = task['_id']
+                taskname = task['taskname']
                 task['state'] = "killed"
-                logger.emit(node_id,{"message":f"changing status of task {id} to killed"})
+                logger.emit(node_id,{"message":f"changing status of task {taskname} to killed"})
                 db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
             return
         counter -= 1
@@ -91,8 +107,9 @@ def kill_master_container():
     # all tasks should either be in success, killed, or created state
     for task in db.tasks.find({"state": "running"}):
         id = task['_id']
+        taskname = task['taskname']
         task['state'] = "killed"
-        logger.emit(node_id,{"message":f"changing status of task {id} to killed"})
+        logger.emit(node_id,{"message":f"changing status of task {taskname} to killed"})
         db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
 
 def restart_after_killing_master_container():
@@ -104,11 +121,13 @@ def enter_testing_loop():
     while True:
         if (counter % 4 == 0):
             kill_master_container()
+            send_tasks_summary_to_log()
             time.sleep(30)
             restart_after_killing_master_container()
             time.sleep(30)
         else:
             kill_random_slave_container()
+            send_tasks_summary_to_log()
             time.sleep(30)
             run_slave_container()
             time.sleep(30)
@@ -117,6 +136,7 @@ def enter_testing_loop():
 if __name__ == '__main__':
     run_mongodb_container()
     run_task_generator()
+    send_tasks_summary_to_log()
     run_master_container()
     run_slave_containers(MAX_SLAVE_CONTAINERS)
     time.sleep(60)
