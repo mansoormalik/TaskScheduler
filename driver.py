@@ -121,16 +121,3 @@ if __name__ == '__main__':
     run_slave_containers(MAX_SLAVE_CONTAINERS)
     time.sleep(60)
     enter_testing_loop()
-    """
-    sys.exit(0)
-    time.sleep(5)
-    kill_master_container()
-    time.sleep(10)
-    restart_after_killing_master_container()
-    kill_random_slave_container()
-    time.sleep(5)
-    kill_random_slave_container()
-    time.sleep(5)
-    run_slave_container()
-    """
-
