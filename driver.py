@@ -1,6 +1,7 @@
 import subprocess
 import time
 import pymongo
+import sys
 from subprocess import call
 from subprocess import check_output
 from pymongo import MongoClient
@@ -38,7 +39,7 @@ def run_task_generator():
 def run_master_container():
     global master_container
     global master_host
-    cmd = f"sudo docker run --log-driver=fluentd -d master python /opt/scheduler/master.py {mongo_host} {mongo_port}"
+    cmd = f"sudo docker run -d master python /opt/scheduler/master.py {mongo_host} {mongo_port}"
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     master_container = check_output(cmd, shell=True).strip().decode()
@@ -47,7 +48,7 @@ def run_master_container():
 
 def run_slave_container():
     global next_slave_idx
-    cmd = f"sudo docker run --log-driver=fluentd -d slave python /opt/scheduler/slave.py {master_host} slave-{next_slave_idx}"
+    cmd = f"sudo docker run -d slave python /opt/scheduler/slave.py {master_host} slave-{next_slave_idx}"
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     container = check_output(cmd, shell=True).strip().decode()
@@ -94,6 +95,7 @@ if __name__ == '__main__':
     run_task_generator()
     run_master_container()
     run_slave_containers(MAX_SLAVE_CONTAINERS)
+    sys.exit(0)
     time.sleep(5)
     kill_master_container()
     time.sleep(10)

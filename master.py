@@ -4,11 +4,12 @@ import masterslave_pb2
 import masterslave_pb2_grpc
 import sys
 import pymongo
-import logging
 import threading
+
 from pymongo import MongoClient
 from concurrent import futures
 from collections import deque
+from fluent import sender
 
 if (len(sys.argv) != 3):
     print("usage: python master.py host port")
@@ -16,12 +17,11 @@ if (len(sys.argv) != 3):
 
 host = sys.argv[1]
 port = int(sys.argv[2])
+node_id = "master"
 
-FORMAT = '%(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.info("Master is launching")
+#TODO: hardcoded values should be read from config file
+logger = sender.FluentSender("scheduler", host="172.17.0.2", port=24224)
+logger.emit(node_id,{"message":"master is starting"})
 
 CHECK_TASKS_INTERVAL_IN_SECS = 10
 client = MongoClient(host, port)
@@ -42,7 +42,7 @@ class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
             task['state'] = "running"
             db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
             tasklock.release()
-            logger.info(f"Master is assigning task {taskname} to {request.slaveid}")
+            logger.emit(node_id, {"message": f"assigned task {taskname} to {request.slaveid}"})
             return masterslave_pb2.TaskResponse(taskname=taskname, sleeptime=sleeptime)
         else:
             return masterslave_pb2.TaskResponse(taskname="", sleeptime=0)

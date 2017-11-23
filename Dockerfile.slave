@@ -1,6 +1,8 @@
 FROM python:3
 
 RUN python -m pip install grpcio
+RUN python -m pip install msgpack-python
+RUN python -m pip install fluent-logger
 
 COPY slave.py /opt/scheduler/
 COPY masterslave_pb2.py /opt/scheduler/
