@@ -1,0 +1,238 @@
+[1;32m2017-11-23 22:32:59 +0000 [info]: reading config file path="/fluentd/etc/fluent.conf"[0;39m
+[1;32m2017-11-23 22:32:59 +0000 [info]: starting fluentd-0.12.41[0;39m
+[1;32m2017-11-23 22:32:59 +0000 [info]: gem 'fluentd' version '0.12.41'[0;39m
+[1;32m2017-11-23 22:32:59 +0000 [info]: adding match pattern="*" type="stdout"[0;39m
+[1;32m2017-11-23 22:32:59 +0000 [info]: adding match pattern="scheduler.**" type="stdout"[0;39m
+[1;32m2017-11-23 22:32:59 +0000 [info]: adding source type="forward"[0;39m
+[1;32m2017-11-23 22:32:59 +0000 [info]: using configuration file: <ROOT>
+  <source>
+    @type forward
+  </source>
+  <match *>
+    @type stdout
+  </match>
+  <match scheduler.**>
+    @type stdout
+  </match>
+</ROOT>[0;39m
+[1;32m2017-11-23 22:32:59 +0000 [info]: listening fluent socket on 0.0.0.0:24224[0;39m
+2017-11-23 22:33:01 +0000 scheduler.driver: {"message":"driver is starting"}
+2017-11-23 22:33:02 +0000 scheduler.driver: {"message":"launched mongod container","container_id":"fcfa6c5e3dd8"}
+2017-11-23 22:33:03 +0000 scheduler.driver: {"message":"tasks summary","created":"40","running":"0","killed":"0","success":"0"}
+2017-11-23 22:33:04 +0000 scheduler.driver: {"message":"launched master container","container_id":"28105ea338f7"}
+2017-11-23 22:33:04 +0000 scheduler.master: {"message":"master is starting"}
+2017-11-23 22:33:04 +0000 scheduler.driver: {"message":"launched slave-0 container","container_id":"765c2b04d957"}
+2017-11-23 22:33:04 +0000 scheduler.slave-0: {"message":"slave is starting"}
+2017-11-23 22:33:05 +0000 scheduler.driver: {"message":"launched slave-1 container","container_id":"8b20ff79611a"}
+2017-11-23 22:33:05 +0000 scheduler.master: {"message":"40 tasks are queued"}
+2017-11-23 22:33:05 +0000 scheduler.master: {"message":"assigned task bggsdbijfwvdyntcijpbrpjovotabjgg to slave-0"}
+2017-11-23 22:33:05 +0000 scheduler.slave-0: {"message":"starting task bggsdbijfwvdyntcijpbrpjovotabjgg"}
+2017-11-23 22:33:05 +0000 scheduler.slave-1: {"message":"slave is starting"}
+2017-11-23 22:33:05 +0000 scheduler.driver: {"message":"launched slave-2 container","container_id":"b13d5649bf65"}
+2017-11-23 22:33:05 +0000 scheduler.master: {"message":"39 tasks are queued"}
+2017-11-23 22:33:05 +0000 scheduler.master: {"message":"assigned task qbyisrdkfiqwtotemsmncmswmaoenivj to slave-1"}
+2017-11-23 22:33:05 +0000 scheduler.slave-1: {"message":"starting task qbyisrdkfiqwtotemsmncmswmaoenivj"}
+2017-11-23 22:33:05 +0000 scheduler.slave-2: {"message":"slave is starting"}
+2017-11-23 22:33:06 +0000 scheduler.master: {"message":"38 tasks are queued"}
+2017-11-23 22:33:06 +0000 scheduler.master: {"message":"assigned task scenkdiiymuuurrqznkeexhakhgtdyqn to slave-2"}
+2017-11-23 22:33:06 +0000 scheduler.slave-2: {"message":"starting task scenkdiiymuuurrqznkeexhakhgtdyqn"}
+2017-11-23 22:33:06 +0000 scheduler.driver: {"message":"launched slave-3 container","container_id":"1c02db580826"}
+2017-11-23 22:33:06 +0000 scheduler.slave-0: {"message":"completed task bggsdbijfwvdyntcijpbrpjovotabjgg"}
+2017-11-23 22:33:06 +0000 scheduler.master: {"message":"37 tasks are queued"}
+2017-11-23 22:33:06 +0000 scheduler.master: {"message":"assigned task kowcoqzcbmgxshvqzoybrkdxymlsqfit to slave-0"}
+2017-11-23 22:33:06 +0000 scheduler.slave-0: {"message":"starting task kowcoqzcbmgxshvqzoybrkdxymlsqfit"}
+2017-11-23 22:33:06 +0000 scheduler.slave-3: {"message":"slave is starting"}
+2017-11-23 22:33:06 +0000 scheduler.master: {"message":"36 tasks are queued"}
+2017-11-23 22:33:06 +0000 scheduler.master: {"message":"assigned task tlrgqulhmgntowxqosgokpvmaembzmlr to slave-3"}
+2017-11-23 22:33:06 +0000 scheduler.slave-3: {"message":"starting task tlrgqulhmgntowxqosgokpvmaembzmlr"}
+2017-11-23 22:33:15 +0000 scheduler.slave-2: {"message":"completed task scenkdiiymuuurrqznkeexhakhgtdyqn"}
+2017-11-23 22:33:15 +0000 scheduler.master: {"message":"35 tasks are queued"}
+2017-11-23 22:33:15 +0000 scheduler.master: {"message":"assigned task zljqokqmgcycvdeqkftxrxjoupyuxgvy to slave-2"}
+2017-11-23 22:33:15 +0000 scheduler.slave-2: {"message":"starting task zljqokqmgcycvdeqkftxrxjoupyuxgvy"}
+2017-11-23 22:33:19 +0000 scheduler.slave-3: {"message":"completed task tlrgqulhmgntowxqosgokpvmaembzmlr"}
+2017-11-23 22:33:19 +0000 scheduler.master: {"message":"34 tasks are queued"}
+2017-11-23 22:33:19 +0000 scheduler.master: {"message":"assigned task urdofijtcsypnilugbfspygazjdendvo to slave-3"}
+2017-11-23 22:33:19 +0000 scheduler.slave-3: {"message":"starting task urdofijtcsypnilugbfspygazjdendvo"}
+2017-11-23 22:33:20 +0000 scheduler.slave-1: {"message":"completed task qbyisrdkfiqwtotemsmncmswmaoenivj"}
+2017-11-23 22:33:20 +0000 scheduler.master: {"message":"33 tasks are queued"}
+2017-11-23 22:33:20 +0000 scheduler.master: {"message":"assigned task azzxfwxnaduxejvrszjrvdhtfaykapum to slave-1"}
+2017-11-23 22:33:20 +0000 scheduler.slave-1: {"message":"starting task azzxfwxnaduxejvrszjrvdhtfaykapum"}
+2017-11-23 22:33:23 +0000 scheduler.slave-2: {"message":"completed task zljqokqmgcycvdeqkftxrxjoupyuxgvy"}
+2017-11-23 22:33:23 +0000 scheduler.master: {"message":"32 tasks are queued"}
+2017-11-23 22:33:23 +0000 scheduler.master: {"message":"assigned task nwwvmlajrbzqhrgwznfkcyniwaksnnyg to slave-2"}
+2017-11-23 22:33:23 +0000 scheduler.slave-2: {"message":"starting task nwwvmlajrbzqhrgwznfkcyniwaksnnyg"}
+2017-11-23 22:33:24 +0000 scheduler.slave-3: {"message":"completed task urdofijtcsypnilugbfspygazjdendvo"}
+2017-11-23 22:33:24 +0000 scheduler.master: {"message":"31 tasks are queued"}
+2017-11-23 22:33:24 +0000 scheduler.master: {"message":"assigned task ssjaavtcxqoprfubzdrfqchbbuiszoxp to slave-3"}
+2017-11-23 22:33:24 +0000 scheduler.slave-3: {"message":"starting task ssjaavtcxqoprfubzdrfqchbbuiszoxp"}
+2017-11-23 22:33:25 +0000 scheduler.slave-0: {"message":"completed task kowcoqzcbmgxshvqzoybrkdxymlsqfit"}
+2017-11-23 22:33:25 +0000 scheduler.master: {"message":"30 tasks are queued"}
+2017-11-23 22:33:25 +0000 scheduler.master: {"message":"assigned task jqhpmpbbxfmjacqzygdxydodnjodiown to slave-0"}
+2017-11-23 22:33:25 +0000 scheduler.slave-0: {"message":"starting task jqhpmpbbxfmjacqzygdxydodnjodiown"}
+2017-11-23 22:33:26 +0000 scheduler.slave-1: {"message":"completed task azzxfwxnaduxejvrszjrvdhtfaykapum"}
+2017-11-23 22:33:26 +0000 scheduler.master: {"message":"29 tasks are queued"}
+2017-11-23 22:33:26 +0000 scheduler.master: {"message":"assigned task ajabbfvsdjuzqmrumevlzvwjxmcuhkhi to slave-1"}
+2017-11-23 22:33:26 +0000 scheduler.slave-1: {"message":"starting task ajabbfvsdjuzqmrumevlzvwjxmcuhkhi"}
+2017-11-23 22:33:27 +0000 scheduler.slave-3: {"message":"completed task ssjaavtcxqoprfubzdrfqchbbuiszoxp"}
+2017-11-23 22:33:27 +0000 scheduler.master: {"message":"28 tasks are queued"}
+2017-11-23 22:33:27 +0000 scheduler.master: {"message":"assigned task xkffksvefhfepekhphougxggoqbrhpzr to slave-3"}
+2017-11-23 22:33:27 +0000 scheduler.slave-3: {"message":"starting task xkffksvefhfepekhphougxggoqbrhpzr"}
+2017-11-23 22:33:32 +0000 scheduler.slave-2: {"message":"completed task nwwvmlajrbzqhrgwznfkcyniwaksnnyg"}
+2017-11-23 22:33:32 +0000 scheduler.master: {"message":"27 tasks are queued"}
+2017-11-23 22:33:32 +0000 scheduler.master: {"message":"assigned task spgjlhupnqrjijjdejrmpimogfekadfp to slave-2"}
+2017-11-23 22:33:32 +0000 scheduler.slave-2: {"message":"starting task spgjlhupnqrjijjdejrmpimogfekadfp"}
+2017-11-23 22:33:33 +0000 scheduler.slave-1: {"message":"completed task ajabbfvsdjuzqmrumevlzvwjxmcuhkhi"}
+2017-11-23 22:33:33 +0000 scheduler.master: {"message":"26 tasks are queued"}
+2017-11-23 22:33:33 +0000 scheduler.master: {"message":"assigned task tojtvnduhjjoyieirlcnaxouarnvlmfg to slave-1"}
+2017-11-23 22:33:33 +0000 scheduler.slave-1: {"message":"starting task tojtvnduhjjoyieirlcnaxouarnvlmfg"}
+2017-11-23 22:33:38 +0000 scheduler.slave-2: {"message":"completed task spgjlhupnqrjijjdejrmpimogfekadfp"}
+2017-11-23 22:33:38 +0000 scheduler.master: {"message":"25 tasks are queued"}
+2017-11-23 22:33:38 +0000 scheduler.master: {"message":"assigned task pbydifyrzymzegcyhjkdeapnsfankwmn to slave-2"}
+2017-11-23 22:33:38 +0000 scheduler.slave-2: {"message":"starting task pbydifyrzymzegcyhjkdeapnsfankwmn"}
+2017-11-23 22:33:39 +0000 scheduler.slave-3: {"message":"completed task xkffksvefhfepekhphougxggoqbrhpzr"}
+2017-11-23 22:33:39 +0000 scheduler.master: {"message":"24 tasks are queued"}
+2017-11-23 22:33:39 +0000 scheduler.master: {"message":"assigned task otygpsxibqqbedlpkluicwyfcknqzsvf to slave-3"}
+2017-11-23 22:33:39 +0000 scheduler.slave-3: {"message":"starting task otygpsxibqqbedlpkluicwyfcknqzsvf"}
+2017-11-23 22:33:43 +0000 scheduler.slave-0: {"message":"completed task jqhpmpbbxfmjacqzygdxydodnjodiown"}
+2017-11-23 22:33:43 +0000 scheduler.master: {"message":"23 tasks are queued"}
+2017-11-23 22:33:43 +0000 scheduler.master: {"message":"assigned task busjaaywmfsnthaddlduwjzqserrpilh to slave-0"}
+2017-11-23 22:33:43 +0000 scheduler.slave-0: {"message":"starting task busjaaywmfsnthaddlduwjzqserrpilh"}
+2017-11-23 22:33:46 +0000 scheduler.slave-1: {"message":"completed task tojtvnduhjjoyieirlcnaxouarnvlmfg"}
+2017-11-23 22:33:46 +0000 scheduler.master: {"message":"22 tasks are queued"}
+2017-11-23 22:33:46 +0000 scheduler.master: {"message":"assigned task niqqketifhqdwwzlamtnrpkqmpuaikbj to slave-1"}
+2017-11-23 22:33:46 +0000 scheduler.slave-1: {"message":"starting task niqqketifhqdwwzlamtnrpkqmpuaikbj"}
+2017-11-23 22:33:49 +0000 scheduler.slave-3: {"message":"completed task otygpsxibqqbedlpkluicwyfcknqzsvf"}
+2017-11-23 22:33:49 +0000 scheduler.master: {"message":"21 tasks are queued"}
+2017-11-23 22:33:49 +0000 scheduler.master: {"message":"assigned task effnpqrlhblzmvtxqfkqqihntqpcsjbg to slave-3"}
+2017-11-23 22:33:49 +0000 scheduler.slave-3: {"message":"starting task effnpqrlhblzmvtxqfkqqihntqpcsjbg"}
+2017-11-23 22:33:52 +0000 scheduler.slave-1: {"message":"completed task niqqketifhqdwwzlamtnrpkqmpuaikbj"}
+2017-11-23 22:33:52 +0000 scheduler.master: {"message":"20 tasks are queued"}
+2017-11-23 22:33:52 +0000 scheduler.master: {"message":"assigned task uawdxwgkfjnpgavfvhztlqzoavjrdzvy to slave-1"}
+2017-11-23 22:33:52 +0000 scheduler.slave-1: {"message":"starting task uawdxwgkfjnpgavfvhztlqzoavjrdzvy"}
+2017-11-23 22:33:53 +0000 scheduler.slave-0: {"message":"completed task busjaaywmfsnthaddlduwjzqserrpilh"}
+2017-11-23 22:33:53 +0000 scheduler.master: {"message":"19 tasks are queued"}
+2017-11-23 22:33:53 +0000 scheduler.master: {"message":"assigned task byytjtvbyetzrtgkyfzckwldoivimeka to slave-0"}
+2017-11-23 22:33:53 +0000 scheduler.slave-0: {"message":"starting task byytjtvbyetzrtgkyfzckwldoivimeka"}
+2017-11-23 22:33:56 +0000 scheduler.slave-2: {"message":"completed task pbydifyrzymzegcyhjkdeapnsfankwmn"}
+2017-11-23 22:33:56 +0000 scheduler.master: {"message":"18 tasks are queued"}
+2017-11-23 22:33:56 +0000 scheduler.master: {"message":"assigned task pqbqkgxfdaxgknruqdjfqthbgkilxavu to slave-2"}
+2017-11-23 22:33:56 +0000 scheduler.slave-2: {"message":"starting task pqbqkgxfdaxgknruqdjfqthbgkilxavu"}
+2017-11-23 22:33:56 +0000 scheduler.slave-0: {"message":"completed task byytjtvbyetzrtgkyfzckwldoivimeka"}
+2017-11-23 22:33:56 +0000 scheduler.master: {"message":"17 tasks are queued"}
+2017-11-23 22:33:56 +0000 scheduler.master: {"message":"assigned task fzetcuaszvowgxyvbwpbdnuvzzoswiof to slave-0"}
+2017-11-23 22:33:56 +0000 scheduler.slave-0: {"message":"starting task fzetcuaszvowgxyvbwpbdnuvzzoswiof"}
+2017-11-23 22:33:59 +0000 scheduler.slave-3: {"message":"completed task effnpqrlhblzmvtxqfkqqihntqpcsjbg"}
+2017-11-23 22:33:59 +0000 scheduler.master: {"message":"16 tasks are queued"}
+2017-11-23 22:33:59 +0000 scheduler.master: {"message":"assigned task gsxswkenphsojntrkndacydrltfojhpn to slave-3"}
+2017-11-23 22:33:59 +0000 scheduler.slave-3: {"message":"starting task gsxswkenphsojntrkndacydrltfojhpn"}
+2017-11-23 22:34:05 +0000 scheduler.slave-1: {"message":"completed task uawdxwgkfjnpgavfvhztlqzoavjrdzvy"}
+2017-11-23 22:34:05 +0000 scheduler.master: {"message":"15 tasks are queued"}
+2017-11-23 22:34:05 +0000 scheduler.master: {"message":"assigned task vnecmehbiaavpuabrvcltkypxcbbqdke to slave-1"}
+2017-11-23 22:34:05 +0000 scheduler.slave-1: {"message":"starting task vnecmehbiaavpuabrvcltkypxcbbqdke"}
+2017-11-23 22:34:06 +0000 scheduler.driver: {"message":"killing master"}
+2017-11-23 22:34:06 +0000 scheduler.driver: {"message":"changing status of task vnecmehbiaavpuabrvcltkypxcbbqdke to killed"}
+2017-11-23 22:34:06 +0000 scheduler.driver: {"message":"changing status of task gsxswkenphsojntrkndacydrltfojhpn to killed"}
+2017-11-23 22:34:06 +0000 scheduler.driver: {"message":"changing status of task fzetcuaszvowgxyvbwpbdnuvzzoswiof to killed"}
+2017-11-23 22:34:06 +0000 scheduler.driver: {"message":"changing status of task pqbqkgxfdaxgknruqdjfqthbgkilxavu to killed"}
+2017-11-23 22:34:06 +0000 scheduler.driver: {"message":"tasks summary","created":"14","running":"0","killed":"4","success":"22"}
+2017-11-23 22:34:08 +0000 scheduler.slave-0: {"message":"completed task fzetcuaszvowgxyvbwpbdnuvzzoswiof"}
+2017-11-23 22:34:10 +0000 scheduler.slave-3: {"message":"completed task gsxswkenphsojntrkndacydrltfojhpn"}
+2017-11-23 22:34:12 +0000 scheduler.slave-1: {"message":"completed task vnecmehbiaavpuabrvcltkypxcbbqdke"}
+2017-11-23 22:34:14 +0000 scheduler.slave-2: {"message":"completed task pqbqkgxfdaxgknruqdjfqthbgkilxavu"}
+2017-11-23 22:34:36 +0000 scheduler.driver: {"message":"launched master container","container_id":"1c5476d2adae"}
+2017-11-23 22:34:37 +0000 scheduler.master: {"message":"master is starting"}
+2017-11-23 22:34:37 +0000 scheduler.driver: {"message":"launched slave-4 container","container_id":"671068a64388"}
+2017-11-23 22:34:37 +0000 scheduler.slave-4: {"message":"slave is starting"}
+2017-11-23 22:34:37 +0000 scheduler.driver: {"message":"launched slave-5 container","container_id":"ce04c7c15d43"}
+2017-11-23 22:34:37 +0000 scheduler.master: {"message":"18 tasks are queued"}
+2017-11-23 22:34:37 +0000 scheduler.master: {"message":"assigned task pqbqkgxfdaxgknruqdjfqthbgkilxavu to slave-4"}
+2017-11-23 22:34:37 +0000 scheduler.slave-4: {"message":"starting task pqbqkgxfdaxgknruqdjfqthbgkilxavu"}
+2017-11-23 22:34:38 +0000 scheduler.slave-5: {"message":"slave is starting"}
+2017-11-23 22:34:38 +0000 scheduler.driver: {"message":"launched slave-6 container","container_id":"bdd08e3c47c6"}
+2017-11-23 22:34:38 +0000 scheduler.master: {"message":"17 tasks are queued"}
+2017-11-23 22:34:38 +0000 scheduler.master: {"message":"assigned task fzetcuaszvowgxyvbwpbdnuvzzoswiof to slave-5"}
+2017-11-23 22:34:38 +0000 scheduler.slave-5: {"message":"starting task fzetcuaszvowgxyvbwpbdnuvzzoswiof"}
+2017-11-23 22:34:38 +0000 scheduler.slave-6: {"message":"slave is starting"}
+2017-11-23 22:34:38 +0000 scheduler.master: {"message":"16 tasks are queued"}
+2017-11-23 22:34:38 +0000 scheduler.master: {"message":"assigned task gsxswkenphsojntrkndacydrltfojhpn to slave-6"}
+2017-11-23 22:34:38 +0000 scheduler.slave-6: {"message":"starting task gsxswkenphsojntrkndacydrltfojhpn"}
+2017-11-23 22:34:38 +0000 scheduler.driver: {"message":"launched slave-7 container","container_id":"673cfd074df3"}
+2017-11-23 22:34:38 +0000 scheduler.slave-7: {"message":"slave is starting"}
+2017-11-23 22:34:39 +0000 scheduler.master: {"message":"15 tasks are queued"}
+2017-11-23 22:34:39 +0000 scheduler.master: {"message":"assigned task vnecmehbiaavpuabrvcltkypxcbbqdke to slave-7"}
+2017-11-23 22:34:39 +0000 scheduler.slave-7: {"message":"starting task vnecmehbiaavpuabrvcltkypxcbbqdke"}
+2017-11-23 22:34:46 +0000 scheduler.slave-7: {"message":"completed task vnecmehbiaavpuabrvcltkypxcbbqdke"}
+2017-11-23 22:34:46 +0000 scheduler.master: {"message":"14 tasks are queued"}
+2017-11-23 22:34:46 +0000 scheduler.master: {"message":"assigned task mqbwacfatsftpzlekxvhtjqwkebjfffa to slave-7"}
+2017-11-23 22:34:46 +0000 scheduler.slave-7: {"message":"starting task mqbwacfatsftpzlekxvhtjqwkebjfffa"}
+2017-11-23 22:34:49 +0000 scheduler.slave-6: {"message":"completed task gsxswkenphsojntrkndacydrltfojhpn"}
+2017-11-23 22:34:49 +0000 scheduler.master: {"message":"13 tasks are queued"}
+2017-11-23 22:34:49 +0000 scheduler.master: {"message":"assigned task cibczxhofzivcfxfveaivoxsrosptqvo to slave-6"}
+2017-11-23 22:34:49 +0000 scheduler.slave-6: {"message":"starting task cibczxhofzivcfxfveaivoxsrosptqvo"}
+2017-11-23 22:34:50 +0000 scheduler.slave-5: {"message":"completed task fzetcuaszvowgxyvbwpbdnuvzzoswiof"}
+2017-11-23 22:34:50 +0000 scheduler.master: {"message":"12 tasks are queued"}
+2017-11-23 22:34:50 +0000 scheduler.master: {"message":"assigned task cqnncnzcpuizdvfkzokedeymwdrszvxj to slave-5"}
+2017-11-23 22:34:50 +0000 scheduler.slave-5: {"message":"starting task cqnncnzcpuizdvfkzokedeymwdrszvxj"}
+2017-11-23 22:34:50 +0000 scheduler.slave-6: {"message":"completed task cibczxhofzivcfxfveaivoxsrosptqvo"}
+2017-11-23 22:34:50 +0000 scheduler.master: {"message":"11 tasks are queued"}
+2017-11-23 22:34:50 +0000 scheduler.master: {"message":"assigned task vuaidimfaylbsissjcnphmjbwusxfike to slave-6"}
+2017-11-23 22:34:50 +0000 scheduler.slave-6: {"message":"starting task vuaidimfaylbsissjcnphmjbwusxfike"}
+2017-11-23 22:34:51 +0000 scheduler.slave-5: {"message":"completed task cqnncnzcpuizdvfkzokedeymwdrszvxj"}
+2017-11-23 22:34:51 +0000 scheduler.master: {"message":"10 tasks are queued"}
+2017-11-23 22:34:51 +0000 scheduler.master: {"message":"assigned task agbkgfnlzvxmpzqllcigkoriamhjohnr to slave-5"}
+2017-11-23 22:34:51 +0000 scheduler.slave-5: {"message":"starting task agbkgfnlzvxmpzqllcigkoriamhjohnr"}
+2017-11-23 22:34:55 +0000 scheduler.slave-7: {"message":"completed task mqbwacfatsftpzlekxvhtjqwkebjfffa"}
+2017-11-23 22:34:55 +0000 scheduler.master: {"message":"9 tasks are queued"}
+2017-11-23 22:34:55 +0000 scheduler.master: {"message":"assigned task zghlbcdelenxvwqmgapidumnplzrxiby to slave-7"}
+2017-11-23 22:34:55 +0000 scheduler.slave-7: {"message":"starting task zghlbcdelenxvwqmgapidumnplzrxiby"}
+2017-11-23 22:34:55 +0000 scheduler.slave-6: {"message":"completed task vuaidimfaylbsissjcnphmjbwusxfike"}
+2017-11-23 22:34:55 +0000 scheduler.master: {"message":"8 tasks are queued"}
+2017-11-23 22:34:55 +0000 scheduler.master: {"message":"assigned task tbkdtttukjspeowlkqzdqkwnondrwcnb to slave-6"}
+2017-11-23 22:34:55 +0000 scheduler.slave-6: {"message":"starting task tbkdtttukjspeowlkqzdqkwnondrwcnb"}
+2017-11-23 22:34:55 +0000 scheduler.slave-4: {"message":"completed task pqbqkgxfdaxgknruqdjfqthbgkilxavu"}
+2017-11-23 22:34:55 +0000 scheduler.master: {"message":"7 tasks are queued"}
+2017-11-23 22:34:55 +0000 scheduler.master: {"message":"assigned task xvwcmktdcushnmlovucajhagkdofvemz to slave-4"}
+2017-11-23 22:34:55 +0000 scheduler.slave-4: {"message":"starting task xvwcmktdcushnmlovucajhagkdofvemz"}
+2017-11-23 22:35:04 +0000 scheduler.slave-7: {"message":"completed task zghlbcdelenxvwqmgapidumnplzrxiby"}
+2017-11-23 22:35:04 +0000 scheduler.master: {"message":"6 tasks are queued"}
+2017-11-23 22:35:04 +0000 scheduler.master: {"message":"assigned task knbnhucgxfdxdtgcsgrrzhzjyznigaap to slave-7"}
+2017-11-23 22:35:04 +0000 scheduler.slave-7: {"message":"starting task knbnhucgxfdxdtgcsgrrzhzjyznigaap"}
+2017-11-23 22:35:06 +0000 scheduler.slave-7: {"message":"completed task knbnhucgxfdxdtgcsgrrzhzjyznigaap"}
+2017-11-23 22:35:06 +0000 scheduler.master: {"message":"5 tasks are queued"}
+2017-11-23 22:35:06 +0000 scheduler.master: {"message":"assigned task bdpenqchjbhifgzfujbzwkktfbvtvcno to slave-7"}
+2017-11-23 22:35:06 +0000 scheduler.slave-7: {"message":"starting task bdpenqchjbhifgzfujbzwkktfbvtvcno"}
+2017-11-23 22:35:07 +0000 scheduler.slave-4: {"message":"completed task xvwcmktdcushnmlovucajhagkdofvemz"}
+2017-11-23 22:35:07 +0000 scheduler.master: {"message":"4 tasks are queued"}
+2017-11-23 22:35:07 +0000 scheduler.master: {"message":"assigned task ulgeuqgvsepguuhfbmyqutkoydrarlxb to slave-4"}
+2017-11-23 22:35:07 +0000 scheduler.slave-4: {"message":"starting task ulgeuqgvsepguuhfbmyqutkoydrarlxb"}
+2017-11-23 22:35:08 +0000 scheduler.slave-4: {"message":"completed task ulgeuqgvsepguuhfbmyqutkoydrarlxb"}
+2017-11-23 22:35:08 +0000 scheduler.master: {"message":"3 tasks are queued"}
+2017-11-23 22:35:08 +0000 scheduler.master: {"message":"assigned task kcjjdsgkxvnvjtybigtdbsqmuqjkugen to slave-4"}
+2017-11-23 22:35:08 +0000 scheduler.slave-4: {"message":"starting task kcjjdsgkxvnvjtybigtdbsqmuqjkugen"}
+2017-11-23 22:35:09 +0000 scheduler.driver: {"message":"killing slave-7"}
+2017-11-23 22:35:09 +0000 scheduler.driver: {"message":"changing status of task bdpenqchjbhifgzfujbzwkktfbvtvcno to killed"}
+2017-11-23 22:35:09 +0000 scheduler.driver: {"message":"tasks summary","created":"2","running":"3","killed":"1","success":"34"}
+2017-11-23 22:35:09 +0000 scheduler.slave-5: {"message":"completed task agbkgfnlzvxmpzqllcigkoriamhjohnr"}
+2017-11-23 22:35:09 +0000 scheduler.master: {"message":"2 tasks are queued"}
+2017-11-23 22:35:09 +0000 scheduler.master: {"message":"assigned task pngbscoghccnerdcvqkyjvqdjagrrnac to slave-5"}
+2017-11-23 22:35:09 +0000 scheduler.slave-5: {"message":"starting task pngbscoghccnerdcvqkyjvqdjagrrnac"}
+2017-11-23 22:35:14 +0000 scheduler.slave-6: {"message":"completed task tbkdtttukjspeowlkqzdqkwnondrwcnb"}
+2017-11-23 22:35:14 +0000 scheduler.master: {"message":"1 tasks are queued"}
+2017-11-23 22:35:14 +0000 scheduler.master: {"message":"assigned task rzuplmzxcfpxyrkexsejqekmkuoqppkh to slave-6"}
+2017-11-23 22:35:14 +0000 scheduler.slave-6: {"message":"starting task rzuplmzxcfpxyrkexsejqekmkuoqppkh"}
+2017-11-23 22:35:25 +0000 scheduler.slave-5: {"message":"completed task pngbscoghccnerdcvqkyjvqdjagrrnac"}
+2017-11-23 22:35:25 +0000 scheduler.master: {"message":"1 tasks are queued"}
+2017-11-23 22:35:25 +0000 scheduler.master: {"message":"assigned task bdpenqchjbhifgzfujbzwkktfbvtvcno to slave-5"}
+2017-11-23 22:35:25 +0000 scheduler.slave-5: {"message":"starting task bdpenqchjbhifgzfujbzwkktfbvtvcno"}
+2017-11-23 22:35:26 +0000 scheduler.slave-4: {"message":"completed task kcjjdsgkxvnvjtybigtdbsqmuqjkugen"}
+2017-11-23 22:35:29 +0000 scheduler.slave-6: {"message":"completed task rzuplmzxcfpxyrkexsejqekmkuoqppkh"}
+2017-11-23 22:35:31 +0000 scheduler.slave-5: {"message":"completed task bdpenqchjbhifgzfujbzwkktfbvtvcno"}
+2017-11-23 22:35:39 +0000 scheduler.driver: {"message":"launched slave-8 container","container_id":"70a3848ae8e5"}
+2017-11-23 22:35:39 +0000 scheduler.slave-8: {"message":"slave is starting"}
+2017-11-23 22:36:09 +0000 scheduler.driver: {"message":"killing slave-4"}
+2017-11-23 22:36:09 +0000 scheduler.driver: {"message":"tasks summary","created":"0","running":"0","killed":"0","success":"40"}
+^C[1;32m2017-11-23 22:36:34 +0000 [info]: shutting down fluentd[0;39m
+[1;32m2017-11-23 22:36:34 +0000 [info]: shutting down input type="forward" plugin_id="object:2aac80a4bf44"[0;39m
+[1;32m2017-11-23 22:36:34 +0000 [info]: shutting down output type="stdout" plugin_id="object:2aac80d70378"[0;39m
+[1;32m2017-11-23 22:36:34 +0000 [info]: shutting down output type="stdout" plugin_id="object:2aac80a5feb8"[0;39m
+[1;32m2017-11-23 22:36:34 +0000 [info]: process finished code=0[0;39m
