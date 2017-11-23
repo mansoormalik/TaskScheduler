@@ -32,7 +32,9 @@ tasklock = threading.Lock()
 
 class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
     def Task(self, request, context):
-        if (len(unassigned_tasks) > 0):
+        nr_tasks = len(unassigned_tasks)
+        if (nr_tasks > 0):
+            logger.emit(node_id, {"message":f"{nr_tasks} tasks are queued"})
             tasklock.acquire()
             task = unassigned_tasks.pop()
             id = task['_id']
@@ -42,7 +44,7 @@ class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
             task['state'] = "running"
             db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
             tasklock.release()
-            logger.emit(node_id, {"message": f"assigned task {taskname} to {request.slaveid}"})
+            logger.emit(node_id, {"message":f"assigned task {taskname} to {request.slaveid}"})
             return masterslave_pb2.TaskResponse(taskname=taskname, sleeptime=sleeptime)
         else:
             return masterslave_pb2.TaskResponse(taskname="", sleeptime=0)
