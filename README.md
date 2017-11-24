@@ -1,12 +1,12 @@
-# Fault Tolerant Distributed TaskScheduler
+# Fault Tolerant Distributed Task Scheduler
 
 Overview
 -----------
-Distributed task queueing systems often consist of producer nodes that create tasks, worker nodes that execute tasks, and a queuing system that decouples producers and workers. Such systems should scale easily - it should be possible to add producer or worker nodes as needed. The system should also be highly available. Individual producers or workers can fail but the overall system should continue working.
+Distributed task scheduling systems typically consist of producer nodes that submit tasks, worker nodes that execute tasks, and a queueing system that decouples producers and workers. Such systems should scale easily and it should be possible to add or remove producer or worker nodes to handle load fluctuations. These system should also be highly available. The overall system should continue operating even if individual producers or workers fail.
 
 In our implementation, we have a constraint that slaves (workers) cannot access mongodb. Only the master node can. Therefore, the master node + mongodb are behaving as a queueing system. We have no explicit producer nodes but the task_generator.py script simulates this behavior by inserting 100 tasks into mongodb. The master node pulls tasks from mongodb and keeps it in an internal queue. Upon requests from slaves, tasks are assigned. The master node updates mongodb as tasks are completed by slaves. The message exchanges between the master and slave are described in more detail later.
 
-To simulate the fault-tolerance aspect of our implementation, we use the driver.py script. This is also described in more detail below.
+To simulate the fault-tolerant aspect of our implementation, we use the driver.py script. This is also described in more detail below.
 
 Docker Images
 -------------------------
@@ -37,29 +37,25 @@ The slave application is in slave.py. The slave nodes do not send a heartbeat to
 
 Master-Slave Communication
 --------------------------
-The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This does however creates a tight coupling between a master and slave nodes which may not be desirable. However, given the time limitations in completing the implementation, this was viewed as acceptable.
+The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This does however creates a tight coupling between master and slave nodes which may not be desirable. However, given the time limitations in completing the implementation, this was viewed as acceptable.
 
 The protocol between the master and slave is defined in the masterslave.proto file. It consists of:
-1. a task request message that is initiated by a slave
-   if the task queue is non-empty, the master responds by sending the first task in the queue
-   if the task queue is empty, the master responds by sending an empty task (taskname="")
-   the the task queue is empty, the slave waits for a small duration before trying again; for testing purposes the duration was set to 3 seconds
-2. a status update message that is sent by the slave to the master when a task is completed
-   
+1. A task request message that is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
+2. A status update message that is sent by the slave to the master when a task is completed.
 
 Cluster Membership
 --------------------------
 The slave nodes do not send an explicit join or leave message to the master node. The slave nodes are provided with the IP address and port of the master node. The slave nodes communicate with the master node using a wire protocol (gRPC).
 
-The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed to mechanism where slaves would need to notify the master when they were joining or leaving a cluster.
+The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed a mechanism where slaves would need to notify the master when they were joining or leaving a cluster.
 
-Load Balancing
+Load-Balancing
 ---------------
 The number of tasks exceeds the number of slaves and the tasks are of different duration. The tasks are of equal priority. There is no interdependency between tasks and there is no requirement to schedule tasks based on their expected duration. Two schemes were considered for distributing tasks:
 1. master assigns tasks to slaves
 2. slaves request tasks from master
 
-The second option was selected due to its simplicity and the time constraints for implementing the system.
+The second scheme was selected due to its simplicity and the time constraints for implementing the system.
 
 
 Scalability
@@ -68,7 +64,7 @@ The system has the undesirable property that there is a single master servicing 
 
 High-Availability
 -----------------
-The system's availability is determined by the availability of the master node as it is a single point of failure. When a master fails, slaves are unable to obtain new tasks. The system can withstand the failure of a single slave nodes if other slave nodes are still available to execute tasks. 
+The system's availability is determined by the availability of the master node as it is a single point of failure. When a master fails, slaves are unable to obtain new tasks. The system can withstand the failure of a single slave nodes as long as other slave nodes are available to execute tasks. 
 
 State Synchronization
 ---------------------
