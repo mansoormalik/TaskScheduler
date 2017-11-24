@@ -3,24 +3,19 @@
 Docker Images
 -------------------------
 1. mongodb: the mongodb docker image is pulled from dockerhub
-2. master: you can pull this image from docker.io/mansoormalik/master or build it using Dockerfile.master
-3. slave: you can pull this image from docker.io/mansoormalik/slave or build it using Dockerfile.slave
+2. master: pull this image from docker.io/mansoormalik/master or build it using Dockerfile.master
+3. slave: pull this image from docker.io/mansoormalik/slave or build it using Dockerfile.slave
 
 The docker_build.sh script can be invoked to build the images for the master and slave on a local machine.
 
 Driver
 -------------------------
-The driver.py program is used to launch container images and assists in testing by killing slave or master containers.
+The driver.py program is used to launch containers. It also assists in testing by killing slave or master containers.
 
 
 Inserting Tasks
 -------------------------
 The task_generator.py program is used to insert tasks into a mongodb instance.
-
-
-Interprocess Communication
---------------------------
-The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave.
 
 Master
 --------------------
@@ -31,10 +26,14 @@ The master application is in master.py. The master node:
 
 Slave
 --------------------
-The slave application is in slave.py. The slave nodes do not send a heartbeat to the master node as the master does not monitor the health of nodes. Instead, the following scheme is used to recover from failures. If a slave fails, the state of the task in mongodb that was (i) assigned to this host and (ii) was in a "running" state is transitioned to a "killed" state. The master is then responsible for fetching all killed tasks from mongodb and reassigning them to other slaves.
+The slave application is in slave.py. The slave nodes do not send a heartbeat to the master node as the master does not monitor the health of nodes. Instead, the following scheme is used to recover from failures. If a slave fails, the state of the task in mongodb that was assigned to this host and was in a "running" state is transitioned to a "killed" state. The master is then responsible for fetching all killed tasks from mongodb and reassigning them to other slaves.
+
+Master-Slave Communication
+--------------------------
+The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This is not a good design choice for a production grade system as it creates a tight coupling between the master and slave nodes. It was chosen due to time constraints in getting a minimal system up and running. For a production grade system, a better design choice is to use a message queueing system.
 
 Joining or Leaving Cluster
------------------------------
+--------------------------
 The slave nodes do not send an explicit join or leave message to the master node. The slave nodes are provided with the IP address and port of the master node. The slave nodes communicate with the master node using a wire protocol (gRPC).
 
 The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed to devise a protocol where slaves would need to notify the master when they were joining or leaving a cluster.
@@ -50,7 +49,7 @@ The second option was selected due to its simplicity and the time constraints fo
 
 
 State Synchronization
-----------------------
+---------------------
 In our system, the state of a task changes from "created" to "running" when it is assigned to a slave. The state can then change again to either "killed" or "success". In addition, the task has a host assigned to it. For an unassigned task this field is empty. This will be updated once a slave is assigned to execute a task. It may need to be changed again if a slave dies and the task needs to be reassigned to another slave. Since either the master or one or more slaves can fail, the mongodb is used to ensure that the system is in a consistent state.
 
 Failure and Recovery
@@ -67,3 +66,12 @@ The recovery mechanism for the slave is simple as it is not responsible for main
 Logging
 -------
 A container running fluentd captures log events from the driver, master, and slave applications. All logs are stored in a JSON format. A sample log file is included in the github repository.
+
+The logs show:
+1. messages from the driver program (starting containers, mappings between container ids and nodes, nodes being killed, tasks statistics in mongodb)
+2. messages from the master (mappings of tasks and slaves)
+3. messages from slaves (starting tasks, completing tasks)
+
+Testing
+-------
+The driver.py program has a rudimentary test loop which kills a node every 60 secs. The master is selected 1 out of every 4 kill operations. For the other 3 times, a random slave node is selected.
