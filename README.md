@@ -12,7 +12,6 @@ Driver
 -------------------------
 The driver.py program is used to launch containers. It also assists in testing by killing slave or master containers.
 
-
 Inserting Tasks
 -------------------------
 The task_generator.py program is used to insert tasks into a mongodb instance.
@@ -30,13 +29,13 @@ The slave application is in slave.py. The slave nodes do not send a heartbeat to
 
 Master-Slave Communication
 --------------------------
-The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This is not a good design choice for a production grade system as it creates a tight coupling between the master and slave nodes. It was chosen due to time constraints in getting a minimal system up and running. For a production grade system, a better design choice is to use a message queueing system.
+The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This is not a good design choice for a production grade system as it creates a tight coupling between the master and slave nodes. It was chosen due to time constraints in getting a minimal system up and running. For a production grade system, a better design choice is to use a managed message queueing system such as AWS SQS	.
 
 Joining or Leaving Cluster
 --------------------------
 The slave nodes do not send an explicit join or leave message to the master node. The slave nodes are provided with the IP address and port of the master node. The slave nodes communicate with the master node using a wire protocol (gRPC).
 
-The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed to devise a protocol where slaves would need to notify the master when they were joining or leaving a cluster.
+The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed to mechanism where slaves would need to notify the master when they were joining or leaving a cluster. A system such as Zookeper could be a good choice for this scenario.
 
 
 Load Balancing
@@ -68,10 +67,13 @@ Logging
 A container running fluentd captures log events from the driver, master, and slave applications. All logs are stored in a JSON format. A sample log file is included in the github repository.
 
 The logs show:
-1. messages from the driver program (starting containers, mappings between container ids and nodes, nodes being killed, tasks statistics in mongodb)
-2. messages from the master (mappings of tasks and slaves)
+1. messages from the driver program (starting containers, mappings between container ids and nodes, nodes being killed, task statistics in mongodb)
+2. messages from the master (number of pending tasks in queue, assigning tasks upon requests from slaves)
 3. messages from slaves (starting tasks, completing tasks)
+
+For a production grade system, much more information would be included in the logs. In our case, the attributes in log messages were purposefully kept to a bare minimum so it would be bvious that the overall system was progressing in completing tasks despite failures of master and slave nodes.
 
 Testing
 -------
-The driver.py program has a rudimentary test loop which kills a node every 60 secs. The master is selected 1 out of every 4 kill operations. For the other 3 times, a random slave node is selected.
+The driver program has a rudimentary test loop which kills a node every 60 secs. The master is selected 1 out of every 4 times. A random slave node is selected the other 3 times. The driver program restarts a new master or slave node 30 seconds after killing it.
+
