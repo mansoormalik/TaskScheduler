@@ -64,3 +64,6 @@ At present, our implementation relies on the following workaround to handle the 
 
 The recovery mechanism for the slave is simple as it is not responsible for maintaining any state. Any tasks that were in a "running" state are marked as killed. These tasks are reassigned by the master to another slave.
 
+Logging
+-------
+A container running fluentd captures log events from the driver, master, and slave applications. All logs are stored in a JSON format. A sample log file is included in the github repository.
