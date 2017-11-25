@@ -40,8 +40,10 @@ Master-Slave Communication
 The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This creates a tight coupling between master and slave nodes which may not be desirable. However, given the time limitations in completing the implementation, this was viewed as acceptable.
 
 The protocol between the master and slave is defined in the masterslave.proto file. It consists of:
-1. A task request message is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
-2. A status update message is sent by the slave to the master when a task is completed.
+1. An acknowledge message is sent by the slave to the master to verify that a channel can be established. If this fails, the slave goes into a retry loop until the master can be reached.
+2. A task request message is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
+3. A status update message is sent by the slave to the master when a task is completed.
+4. When a master is killed, a slave completes its task and goes into a loop waiting for the master to come back on line. When the master is reacheable again, the slave sends a AfterMasterFailure request which ensures that the master updates the state of this task to success in mongodb.
 
 Cluster Membership
 --------------------------
@@ -71,12 +73,12 @@ State Synchronization
 Each task has a state that can change from created, running, killed, or success. Each task also has a host associated with it. The state changes based on actions taken by the slave, master, or mongodb node. The state can diverge momentarily between nodes but it must eventually become consistent.
 
 In our system, a master node changes the state of a task from created to running when it is receives a task request from a slave. The master node then updates mongodb. The master node then responds back to the client with the task name and sleep duration. In this scenario, the following failures are possible:
-(a) The slave node dies before the master can respond back to it. In this scenario, the master and mongodb have an incorrect state for this task. The driver that killed the slave will update mongodb and mark the state as killed. At this point, mongodb has the correct state. The master polls mongodb every 10 seconds and checks for new or killed tasks. It will have threfore have the correct state within 10 seconds.
-(b) The master dies after updating mongodb but before responding to the slave. In this scenario, the task is shown as running. It will not be reassigned. Need a mechanism to handle this scenario.
+1. The slave node dies before the master can respond back to it. In this scenario, the master and mongodb have an incorrect state for this task. The driver that killed the slave will update mongodb and mark the state as killed. At this point, mongodb has the correct state. The master polls mongodb every 10 seconds and checks for new or killed tasks. It will have threfore have the correct state within 10 seconds.
+2. The master dies after updating mongodb but before responding to the slave. In this scenario, the task is shown as running. It will not be reassigned. When the master comes back on line, the slave will send a AfterMasterFailureRequest with the taskname. The master will then update the state in mongodb. At this point, the state will be consistent.
 
 Failure and Recovery
 ----------------------------
-The driver program has a rudimentary test loop which kills a node every 60 secs. The master is selected 1 out of every 4 times. A random slave node is selected the other 3 times. The driver program restarts a new master or slave node 30 seconds after killing it.
+The driver program has a rudimentary test loop which kills a node every 180 secs. The master is selected 1 out of every 4 times. A random slave node is selected the other 3 times. The driver program restarts a new master or slave node 20 seconds after killing it.
 
 Upon recovery, the master retrieves from the mongodb:
 1. all unassigned tasks (state="created")
@@ -98,3 +100,6 @@ The logs show:
 
 For a production grade system, additional information would be included in the logs. In our case, the attributes in log messages were purposefully kept to a bare minimum so it would beeasy to monitor that the overall system was progressing in completing tasks despite failures of master and slave nodes.
 
+MongoDB Snapshots
+------------------
+The mongodb_snapshots directory contain a snapshot of the tasks collection at the beginging and end of a test run.
