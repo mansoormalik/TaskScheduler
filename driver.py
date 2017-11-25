@@ -15,12 +15,13 @@ mongo_port = 27017
 master_container = ""
 master_host = ""
 slave_idx_to_container = {}
-MAX_SLAVE_CONTAINERS = 4
+MAX_SLAVE_CONTAINERS = 3
 next_slave_idx = 0
 mongo_client = None
 db = None
 
-logger = sender.FluentSender("scheduler", host="172.17.0.2", port=24224)
+#TODO: hardcoded values should be read from config file
+logger = sender.FluentSender("scheduler", "172.17.0.2", 24224)
 logger.emit(node_id,{"message":"driver is starting"})
 
 def run_mongodb_container():
@@ -103,18 +104,9 @@ def kill_master_container():
     logger.emit(node_id,{"message":"killing master"})
     cmd = f"sudo docker rm -f {master_container}"
     call(cmd, shell=True)
-    # all slaves will die due to channel failure with master so mark these tasks as failed
-    # all tasks should either be in success, killed, or created state
-    for task in db.tasks.find({"state": "running"}):
-        id = task['_id']
-        taskname = task['taskname']
-        task['state'] = "killed"
-        logger.emit(node_id,{"message":f"changing status of task {taskname} to killed"})
-        db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
 
 def restart_after_killing_master_container():
     run_master_container()
-    run_slave_containers(MAX_SLAVE_CONTAINERS)
 
 def enter_testing_loop():
     counter = 0
@@ -122,15 +114,15 @@ def enter_testing_loop():
         if (counter % 4 == 0):
             kill_master_container()
             send_tasks_summary_to_log()
-            time.sleep(30)
+            time.sleep(20)
             restart_after_killing_master_container()
-            time.sleep(30)
+            time.sleep(160)
         else:
             kill_random_slave_container()
             send_tasks_summary_to_log()
-            time.sleep(30)
+            time.sleep(20)
             run_slave_container()
-            time.sleep(30)
+            time.sleep(160)
         counter += 1    
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='masterslave.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x11masterslave.proto\"\x1e\n\x0bTaskRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\"3\n\x0cTaskResponse\x12\x10\n\x08taskname\x18\x01 \x01(\t\x12\x11\n\tsleeptime\x18\x02 \x01(\x05\"2\n\rStatusRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\x12\x10\n\x08taskname\x18\x02 \x01(\t\"\x10\n\x0eStatusResponse2c\n\rTaskScheduler\x12%\n\x04Task\x12\x0c.TaskRequest\x1a\r.TaskResponse\"\x00\x12+\n\x06Status\x12\x0e.StatusRequest\x1a\x0f.StatusResponse\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x11masterslave.proto\"\x1e\n\x0bTaskRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\"3\n\x0cTaskResponse\x12\x10\n\x08taskname\x18\x01 \x01(\t\x12\x11\n\tsleeptime\x18\x02 \x01(\x05\"2\n\rStatusRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\x12\x10\n\x08taskname\x18\x02 \x01(\t\"\x10\n\x0eStatusResponse\">\n\x19\x41\x66terMasterFailureRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\x12\x10\n\x08taskname\x18\x02 \x01(\t\"\x1c\n\x1a\x41\x66terMasterFailureResponse\"\x14\n\x12\x41\x63knowledgeRequest\"\x15\n\x13\x41\x63knowledgeResponse2\xf0\x01\n\rTaskScheduler\x12%\n\x04Task\x12\x0c.TaskRequest\x1a\r.TaskResponse\"\x00\x12+\n\x06Status\x12\x0e.StatusRequest\x1a\x0f.StatusResponse\"\x00\x12O\n\x12\x41\x66terMasterFailure\x12\x1a.AfterMasterFailureRequest\x1a\x1b.AfterMasterFailureResponse\"\x00\x12:\n\x0b\x41\x63knowledge\x12\x13.AcknowledgeRequest\x1a\x14.AcknowledgeResponse\"\x00\x62\x06proto3')
 )
 
 
@@ -155,10 +155,124 @@ _STATUSRESPONSE = _descriptor.Descriptor(
   serialized_end=174,
 )
 
+
+_AFTERMASTERFAILUREREQUEST = _descriptor.Descriptor(
+  name='AfterMasterFailureRequest',
+  full_name='AfterMasterFailureRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='slaveid', full_name='AfterMasterFailureRequest.slaveid', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='taskname', full_name='AfterMasterFailureRequest.taskname', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=176,
+  serialized_end=238,
+)
+
+
+_AFTERMASTERFAILURERESPONSE = _descriptor.Descriptor(
+  name='AfterMasterFailureResponse',
+  full_name='AfterMasterFailureResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=240,
+  serialized_end=268,
+)
+
+
+_ACKNOWLEDGEREQUEST = _descriptor.Descriptor(
+  name='AcknowledgeRequest',
+  full_name='AcknowledgeRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=270,
+  serialized_end=290,
+)
+
+
+_ACKNOWLEDGERESPONSE = _descriptor.Descriptor(
+  name='AcknowledgeResponse',
+  full_name='AcknowledgeResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=292,
+  serialized_end=313,
+)
+
 DESCRIPTOR.message_types_by_name['TaskRequest'] = _TASKREQUEST
 DESCRIPTOR.message_types_by_name['TaskResponse'] = _TASKRESPONSE
 DESCRIPTOR.message_types_by_name['StatusRequest'] = _STATUSREQUEST
 DESCRIPTOR.message_types_by_name['StatusResponse'] = _STATUSRESPONSE
+DESCRIPTOR.message_types_by_name['AfterMasterFailureRequest'] = _AFTERMASTERFAILUREREQUEST
+DESCRIPTOR.message_types_by_name['AfterMasterFailureResponse'] = _AFTERMASTERFAILURERESPONSE
+DESCRIPTOR.message_types_by_name['AcknowledgeRequest'] = _ACKNOWLEDGEREQUEST
+DESCRIPTOR.message_types_by_name['AcknowledgeResponse'] = _ACKNOWLEDGERESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 TaskRequest = _reflection.GeneratedProtocolMessageType('TaskRequest', (_message.Message,), dict(
@@ -189,6 +303,34 @@ StatusResponse = _reflection.GeneratedProtocolMessageType('StatusResponse', (_me
   ))
 _sym_db.RegisterMessage(StatusResponse)
 
+AfterMasterFailureRequest = _reflection.GeneratedProtocolMessageType('AfterMasterFailureRequest', (_message.Message,), dict(
+  DESCRIPTOR = _AFTERMASTERFAILUREREQUEST,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:AfterMasterFailureRequest)
+  ))
+_sym_db.RegisterMessage(AfterMasterFailureRequest)
+
+AfterMasterFailureResponse = _reflection.GeneratedProtocolMessageType('AfterMasterFailureResponse', (_message.Message,), dict(
+  DESCRIPTOR = _AFTERMASTERFAILURERESPONSE,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:AfterMasterFailureResponse)
+  ))
+_sym_db.RegisterMessage(AfterMasterFailureResponse)
+
+AcknowledgeRequest = _reflection.GeneratedProtocolMessageType('AcknowledgeRequest', (_message.Message,), dict(
+  DESCRIPTOR = _ACKNOWLEDGEREQUEST,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:AcknowledgeRequest)
+  ))
+_sym_db.RegisterMessage(AcknowledgeRequest)
+
+AcknowledgeResponse = _reflection.GeneratedProtocolMessageType('AcknowledgeResponse', (_message.Message,), dict(
+  DESCRIPTOR = _ACKNOWLEDGERESPONSE,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:AcknowledgeResponse)
+  ))
+_sym_db.RegisterMessage(AcknowledgeResponse)
+
 
 
 _TASKSCHEDULER = _descriptor.ServiceDescriptor(
@@ -197,8 +339,8 @@ _TASKSCHEDULER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=176,
-  serialized_end=275,
+  serialized_start=316,
+  serialized_end=556,
   methods=[
   _descriptor.MethodDescriptor(
     name='Task',
@@ -216,6 +358,24 @@ _TASKSCHEDULER = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_STATUSREQUEST,
     output_type=_STATUSRESPONSE,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='AfterMasterFailure',
+    full_name='TaskScheduler.AfterMasterFailure',
+    index=2,
+    containing_service=None,
+    input_type=_AFTERMASTERFAILUREREQUEST,
+    output_type=_AFTERMASTERFAILURERESPONSE,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='Acknowledge',
+    full_name='TaskScheduler.Acknowledge',
+    index=3,
+    containing_service=None,
+    input_type=_ACKNOWLEDGEREQUEST,
+    output_type=_ACKNOWLEDGERESPONSE,
     options=None,
   ),
 ])

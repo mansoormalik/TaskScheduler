@@ -24,6 +24,16 @@ class TaskSchedulerStub(object):
         request_serializer=masterslave__pb2.StatusRequest.SerializeToString,
         response_deserializer=masterslave__pb2.StatusResponse.FromString,
         )
+    self.AfterMasterFailure = channel.unary_unary(
+        '/TaskScheduler/AfterMasterFailure',
+        request_serializer=masterslave__pb2.AfterMasterFailureRequest.SerializeToString,
+        response_deserializer=masterslave__pb2.AfterMasterFailureResponse.FromString,
+        )
+    self.Acknowledge = channel.unary_unary(
+        '/TaskScheduler/Acknowledge',
+        request_serializer=masterslave__pb2.AcknowledgeRequest.SerializeToString,
+        response_deserializer=masterslave__pb2.AcknowledgeResponse.FromString,
+        )
 
 
 class TaskSchedulerServicer(object):
@@ -44,6 +54,20 @@ class TaskSchedulerServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def AfterMasterFailure(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def Acknowledge(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_TaskSchedulerServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -56,6 +80,16 @@ def add_TaskSchedulerServicer_to_server(servicer, server):
           servicer.Status,
           request_deserializer=masterslave__pb2.StatusRequest.FromString,
           response_serializer=masterslave__pb2.StatusResponse.SerializeToString,
+      ),
+      'AfterMasterFailure': grpc.unary_unary_rpc_method_handler(
+          servicer.AfterMasterFailure,
+          request_deserializer=masterslave__pb2.AfterMasterFailureRequest.FromString,
+          response_serializer=masterslave__pb2.AfterMasterFailureResponse.SerializeToString,
+      ),
+      'Acknowledge': grpc.unary_unary_rpc_method_handler(
+          servicer.Acknowledge,
+          request_deserializer=masterslave__pb2.AcknowledgeRequest.FromString,
+          response_serializer=masterslave__pb2.AcknowledgeResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
