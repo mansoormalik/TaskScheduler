@@ -100,7 +100,7 @@ The logs show:
 2. messages from the master (number of pending tasks in queue, assigning tasks upon requests from slaves)
 3. messages from slaves (starting tasks, completing tasks)
 
-For a production grade system, additional information would be included in the logs. In our case, the attributes in log messages were purposefully kept to a bare minimum so it would beeasy to monitor that the overall system was progressing in completing tasks despite failures of master and slave nodes.
+For a production grade system, additional information would be included in the logs. In our case, the attributes in log messages were purposefully kept to a bare minimum so it would be easy to monitor that the overall system was progressing in completing tasks despite failures of master and slave nodes.
 
 MongoDB Snapshots
 ------------------
