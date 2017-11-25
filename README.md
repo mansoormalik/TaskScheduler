@@ -80,14 +80,16 @@ Failure and Recovery
 ----------------------------
 The driver program has a rudimentary test loop which kills a node every 180 secs. The master is selected 1 out of every 4 times. A random slave node is selected the other 3 times. The driver program restarts a new master or slave node 20 seconds after killing it.
 
-Upon recovery, the master retrieves from the mongodb:
-1. all unassigned tasks (state="created")
-2. all killed tasks (state="killed")
-These tasks are then reassiged to slaves.
+When a master is killed:
+1. all slaves that had pending tasks continue until the tasks are completed
+2. slaves then go into a retry loop waiting for the master to come back on line
+3. when a master is back on line, it receives AfterMaster failures messages
+4. upon receiving these messages, the master updates the state of these tasks to success in mongodb
 
-At present, our implementation relies on the following workaround to handle the case of tasks in a "running" state when a master dies. These tasks are also marked as "killed". This is non-optimal as the tasks will have to be redone. But the scheme works and ensures that all tasks in the work queue are eventually completed. Given more time a more efficient scheme would have been implemented to ensure that these tasks do not have to be done a second time. The reason this is done is because when a communicate channel is broken between a master and slave, the slave can time out. Due to time constraints, a retry or recovery mechanism using gRPC was not implemented.
-
-The recovery mechanism for the slave is simple as it is not responsible for maintaining any state. Any tasks that were in a "running" state are marked as killed. These tasks are reassigned by the master to another slave.
+When a slave is killed:
+1. the driver program that killed the slave updates mongodb for this slave and marks all running tasks as killed
+2. the master program scans mongodb every 10 secs for killed tasks and adds it to its queue of tasks that are unassigned
+3. the killed task is eventually assigned to another slave
 
 Logging
 -------
