@@ -4,7 +4,7 @@ Overview
 -----------
 Distributed task scheduling systems typically consist of producer nodes that submit tasks, worker nodes that execute tasks, and a queueing system that decouples producers and workers. Such systems should scale easily and it should be possible to add or remove producer or worker nodes to handle load fluctuations. These system should also be highly available. The overall system should continue operating even if individual producers or workers fail.
 
-In our implementation, we have a constraint that slaves (workers) cannot access mongodb. Only the master node can. Therefore, the master node + mongodb are behaving as a queueing system. We have no explicit producer nodes but the task_generator.py script simulates this behavior by inserting 100 tasks into mongodb. The master node pulls tasks from mongodb and keeps it in an internal queue. Upon requests from slaves, tasks are assigned. The master node updates mongodb as tasks are completed by slaves. The message exchanges between the master and slave are described in more detail later.
+In our implementation, we have a constraint that slaves (workers) cannot access mongodb. Only the master node can. Therefore, the master and mongodb, combined together, is behaving as a queueing system. We have no explicit producer nodes but the task_generator.py script simulates this behavior by inserting 100 tasks into mongodb. The master node pulls tasks from mongodb and keeps it in an internal queue. Upon requests from slaves, tasks are assigned. The master node updates mongodb as tasks are completed by slaves. The message exchanges between the master and slave are described in more detail later.
 
 To simulate the fault-tolerant aspect of our implementation, we use the driver.py script. This is also described in more detail below.
 
@@ -37,11 +37,11 @@ The slave application is in slave.py. The slave nodes do not send a heartbeat to
 
 Master-Slave Communication
 --------------------------
-The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This does however creates a tight coupling between master and slave nodes which may not be desirable. However, given the time limitations in completing the implementation, this was viewed as acceptable.
+The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This creates a tight coupling between master and slave nodes which may not be desirable. However, given the time limitations in completing the implementation, this was viewed as acceptable.
 
 The protocol between the master and slave is defined in the masterslave.proto file. It consists of:
-1. A task request message that is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
-2. A status update message that is sent by the slave to the master when a task is completed.
+1. A task request message is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
+2. A status update message is sent by the slave to the master when a task is completed.
 
 Cluster Membership
 --------------------------
@@ -64,11 +64,15 @@ The system has the undesirable property that there is a single master servicing 
 
 High-Availability
 -----------------
-The system's availability is determined by the availability of the master node as it is a single point of failure. When a master fails, slaves are unable to obtain new tasks. The system can withstand the failure of a single slave nodes as long as other slave nodes are available to execute tasks. 
+The system's availability is determined by the availability of the master node as it is a single point of failure. When a master fails, slaves are unable to obtain new tasks. The system can withstand the failure of a single slave as long as other slaves are available to execute tasks. 
 
 State Synchronization
 ---------------------
-In our system, the state of a task changes from "created" to "running" when it is assigned to a slave. The state can then change again to either "killed" or "success". In addition, the task has a host assigned to it. For an unassigned task this field is empty. This will be updated once a slave is assigned to execute a task. It may need to be changed again if a slave dies and the task needs to be reassigned to another slave. Since either the master or one or more slaves can fail, the mongodb is used to ensure that the system is in a consistent state.
+Each task has a state that can change from created, running, killed, or success. Each task also has a host associated with it. The state changes based on actions taken by the slave, master, or mongodb node. The state can diverge momentarily between nodes but it must eventually become consistent.
+
+In our system, a master node changes the state of a task from created to running when it is receives a task request from a slave. The master node then updates mongodb. The master node then responds back to the client with the task name and sleep duration. In this scenario, the following failures are possible:
+(a) The slave node dies before the master can respond back to it. In this scenario, the master and mongodb have an incorrect state for this task. The driver that killed the slave will update mongodb and mark the state as killed. At this point, mongodb has the correct state. The master polls mongodb every 10 seconds and checks for new or killed tasks. It will have threfore have the correct state within 10 seconds.
+(b) The master dies after updating mongodb but before responding to the slave. In this scenario, the task is shown as running. It will not be reassigned. Need a mechanism to handle this scenario.
 
 Failure and Recovery
 ----------------------------
