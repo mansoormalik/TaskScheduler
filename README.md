@@ -39,7 +39,7 @@ Master-Slave Communication
 --------------------------
 The master and slave communicate using gRPC. This provides a low-latency mechanism for the exchange of messages between the master and slave. This creates a tight coupling between master and slave nodes which may not be desirable. However, given the time limitations in completing the implementation, this was viewed as acceptable.
 
-The protocol between the master and slave is defined in the masterslave.proto file. It consists of:
+The protocol between the master and slave is defined in the masterslave.proto file.
 1. An acknowledge message is sent by the slave to the master to verify that a channel can be established. If this fails, the slave goes into a retry loop until the master can be reached.
 2. A task request message is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
 3. A status update message is sent by the slave to the master when a task is completed.
