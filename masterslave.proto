@@ -3,6 +3,8 @@ syntax = "proto3";
 service TaskScheduler {
   rpc Task(TaskRequest) returns (TaskResponse) {}
   rpc Status(StatusRequest) returns (StatusResponse) {}
+  rpc AfterMasterFailure(AfterMasterFailureRequest) returns (AfterMasterFailureResponse) {}
+  rpc Acknowledge(AcknowledgeRequest) returns (AcknowledgeResponse) {}
 }
 
 message TaskRequest {
@@ -20,4 +22,18 @@ message StatusRequest {
 }
 
 message StatusResponse {
+}
+
+message AfterMasterFailureRequest {
+  string slaveid = 1;
+  string taskname = 2;
+}
+
+message AfterMasterFailureResponse {
+}
+
+message AcknowledgeRequest {
+}
+
+message AcknowledgeResponse {
 }
