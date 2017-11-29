@@ -27,11 +27,14 @@ response = None
 taskname = ""
 is_master_fail_during_task_exec = False
 
+# this code is invoked from a seperate thread from the start_task_execution_loop
+# if master is not reachable then stubs throws an exception which causes
+# it to break out of while loop; when the function returns the thread terminates
+# a new thread will be restarted once a connection is re-established with the master
 def send_heartbeat_to_server():
     global stub
     while True:
         stub.Heartbeat(masterslave_pb2.HeartbeatRequest(slaveid=node_id))
-        #logger.emit(node_id, {"message": "sending heartbeat to server"})
         time.sleep(HEARTBEAT_INTERVAL_IN_SECS)
 
         
