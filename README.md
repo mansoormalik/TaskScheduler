@@ -33,7 +33,7 @@ The master application is in master.py. The master node:
 
 Slave
 --------------------
-The slave application is in slave.py. The slave nodes do not send a heartbeat to the master node as the master does not monitor the health of nodes. Instead, the following scheme is used to recover from failures. If a slave is killed, the state of the task in mongodb that was assigned to this host and was in a "running" state is transitioned to a "killed" state. The driver is responsible for killing the slave and for updating mongodb. The master is then responsible for fetching all killed tasks from mongodb and reassigning them to other slaves.
+The slave application is in slave.py. The slave nodes send a heartbeat to the master node as the master monitors the health of nodes. The heartbeat interval is configurable but was set at 5 seconds for testing purposes. If 3 consecutive heartbeats are missed a slave is considered dead and any tasks that it was assigned that are in a running state are transitioned to killed. The master will eventually reassign killed tasks to other slaves.
 
 Master-Slave Communication
 --------------------------
@@ -41,15 +41,15 @@ The master and slave communicate using gRPC. This provides a low-latency mechani
 
 The protocol between the master and slave is defined in the masterslave.proto file.
 1. An acknowledge message is sent by the slave to the master to verify that a channel can be established. If this fails, the slave goes into a retry loop until the master can be reached.
-2. A task request message is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
-3. A status update message is sent by the slave to the master when a task is completed.
-4. When a master is killed, a slave completes its task and goes into a loop waiting for the master to come back on line. When the master is reacheable again, the slave sends a AfterMasterFailure request which ensures that the master updates the state of this task to success in mongodb.
+2. A join request is sent by the slave to a master prior to requesting new tasks. This allows a master to do the required setup to monitor heartbeats from slaves.
+3. A heartbeat request is sent by the slave to the master at regular intervals.
+4. A task request message is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
+5. A status update message is sent by the slave to the master when a task is completed.
+6. When a master is killed, a slave completes its task and goes into a loop waiting for the master to come back on line. When the master is reacheable again, the slave sends a AfterMasterFailure request which ensures that the master updates the state of this task to success in mongodb.
 
 Cluster Membership
 --------------------------
-The slave nodes do not send an explicit join or leave message to the master node. The slave nodes are provided with the IP address and port of the master node. The slave nodes communicate with the master node using a wire protocol (gRPC).
-
-The primary reason for this approach is that the slaves poll the master to see if a task is available for execution. If we had instead chosen a scheme where the master was assigning tasks to slaves then the master would need to keep track of which slaves were available. In this alternate scenario, we would have needed a mechanism where slaves would need to notify the master when they were joining or leaving a cluster.
+The slave nodes send an explicit join message to the master node prior to requesting tasks and also send a heartbeat message at periodic intervals. The slave nodes are provided with the IP address and port of the master node. The slave nodes communicate with the master node using a wire protocol (gRPC).
 
 Load-Balancing
 ---------------
@@ -73,23 +73,24 @@ State Synchronization
 Each task has a state that can change from created, running, killed, or success. Each task also has a host associated with it. The state changes based on actions taken by the slave, master, or mongodb node. The state can diverge momentarily between nodes but it must eventually become consistent.
 
 In our system, a master node changes the state of a task from created to running when it is receives a task request from a slave. The master node then updates mongodb. The master node then responds back to the client with the task name and sleep duration. In this scenario, the following failures are possible:
-1. The slave node dies after being assigned a task from the master. At this point the state is believed to be in a running state both by the master and mongodb. The task will never complete since the slave has died. The driver that killed the slave will update mongodb and mark the state as killed. At this point, mongodb has the correct state. The master polls mongodb every 10 seconds and checks for new or killed tasks. It will therefore also have the correct state within 10 seconds. The task will eventually be reassigned to another slave and once the task has completed its state will be transitioned to success.
+1. The slave node dies after being assigned a task from the master. At this point the state is believed to be in a running state both by the master and mongodb. The slave has stopped sending heartbeats to the master. After 3 missed heartbeats, the master considers the slave to be dead and transitions the state of the task that was assigned to the slave from running to killed. At this piont, both the master and mongodb have a consistent and correct state. The task will eventually be reassigned to another slave and once the task has completed its state will be transitioned to success.
 2. The master dies after assigning a task to a slave and updating mongodb but before the slave has completed its task. In this scenario, the task is shown as running. It will not be reassigned. When the master comes back on line, the slave will send a AfterMasterFailureRequest with the taskname. The master will then update the state in mongodb. At this point, the state will be consistent.
 
 Failure and Recovery
 ----------------------------
-The driver program has a rudimentary test loop which kills a node every 180 secs. The master is selected 1 out of every 4 times. A random slave node is selected the other 3 times. The driver program restarts a new master or slave node 20 seconds after killing it.
+The driver program has a rudimentary test loop which kills a node every 120 secs. The master is selected 1 out of every 4 times. A random slave node is selected the other 3 times. The driver program restarts a new master or slave node 30 seconds after killing it.
 
 When a master is killed:
 1. all slaves that had pending tasks continue until the tasks are completed
 2. slaves then go into a retry loop waiting for the master to come back on line
-3. when a master is back on line, it receives AfterMaster failures messages
+3. when a master is back on line, it receives AfterMasterFailure messages
 4. upon receiving these messages, the master updates the state of these tasks to success in mongodb
 
 When a slave is killed:
-1. the driver program that killed the slave updates mongodb for this slave and marks all running tasks as killed
-2. the master program scans mongodb every 10 secs for killed tasks and adds it to its queue of tasks that are unassigned
-3. the killed task is eventually assigned to another slave
+1. the slave will stop sending heartbeat messages to the master
+2. after 3 heartbeat messages are missed the master will update mongodb for this slave and mark any running task as killed
+3. the master will eventually reassign the killed task to another slave
+4. when the killed task is completed its state will be changed to success
 
 Logging
 -------
@@ -97,7 +98,7 @@ A container running fluentd captures log events from the driver, master, and sla
 
 The logs show:
 1. messages from the driver (starting containers, mappings between container ids and nodes, nodes being killed, task statistics in mongodb)
-2. messages from the master (number of pending tasks in queue, assigning tasks upon requests from slaves)
+2. messages from the master (number of pending tasks in queue, assigning tasks upon requests from slaves, marking slaves as dead after 3 missed heartbeats)
 3. messages from slaves (starting tasks, completing tasks)
 
 For a production grade system, additional information would be included in the logs. In our case, the attributes in log messages were purposefully kept to a bare minimum so it would be easy to monitor that the overall system was progressing in completing tasks despite failures of master and slave nodes.
