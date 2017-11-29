@@ -28,8 +28,8 @@ Master
 --------------------
 The master application is in master.py. The master node:
 1. does not start or stop slave nodes
-2. does not keep state related to slave nodes (state is captured in a task data structure via association of a task to a host) 
-3. no explicit join or leave protocol is used
+2. monitors the health of slaves based on incoming heartbeat messages
+3. assigns tasks to slaves based on incoming requests
 
 Slave
 --------------------
@@ -41,8 +41,8 @@ The master and slave communicate using gRPC. This provides a low-latency mechani
 
 The protocol between the master and slave is defined in the masterslave.proto file.
 1. An acknowledge message is sent by the slave to the master to verify that a channel can be established. If this fails, the slave goes into a retry loop until the master can be reached.
-2. A join request is sent by the slave to a master prior to requesting new tasks. This allows a master to do the required setup to monitor heartbeats from slaves.
-3. A heartbeat request is sent by the slave to the master at regular intervals.
+2. A join message is sent by the slave to a master prior to requesting new tasks. This allows a master to do the required setup to monitor heartbeats from slaves.
+3. A heartbeat message is sent by the slave to the master at regular intervals.
 4. A task request message is sent by a slave to a master. If the task queue is non-empty, the master responds by sending a message that describes the first task (taskname, sleeptime) in its queue. If the task queue is empty, the master responds by sending an empty task (taskname=""). If the task queue is empty, the slave waits for a small duration before trying again. For testing purposes the duration was set to 3 seconds.
 5. A status update message is sent by the slave to the master when a task is completed.
 6. When a master is killed, a slave completes its task and goes into a loop waiting for the master to come back on line. When the master is reacheable again, the slave sends a AfterMasterFailure request which ensures that the master updates the state of this task to success in mongodb.
