@@ -46,6 +46,8 @@ slaveid_to_heartbeats = {}
 #       workaround for now is to set max_workers=1
 
 class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
+
+    #TODO: need to check that the request is from a valid slave before assigning task
     def Task(self, request, context):
         nr_tasks = len(unassigned_tasks)
         if (nr_tasks > 0):
@@ -61,7 +63,8 @@ class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
             return masterslave_pb2.TaskResponse(taskname=taskname, sleeptime=sleeptime)
         else:
             return masterslave_pb2.TaskResponse(taskname="", sleeptime=0)
-    
+
+    #TODO: need to check that the request is from a valid slave before handling status update
     def Status(self, request, context):
         task = taskname_to_task[request.taskname]
         id = task['_id']
@@ -72,19 +75,27 @@ class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
     def Acknowledge(self, request, context):
         return masterslave_pb2.AcknowledgeResponse()
 
+    #TODO: this works if master has actually failed and has restarted; it does not
+    #      work if there was a network partition and master marked slave as failed due
+    #      missed heartbeats and reassigned task; in that case this message should be
+    #      ignored and the slave should be instructed to shut off
     def AfterMasterFailure(self, request, context):
         db.tasks.update({"taskname":request.taskname},{"$set": {"state":"success"}})
         logger.emit(node_id, {"message":f"setting {request.taskname} to success after master failure"})        
         return masterslave_pb2.AfterMasterFailureResponse()
 
+    # TODO: implementation does not yet address the case where a slave may send multiple join requests
     def Join(self, request, context):
         heartbeats = Heartbeats()
         slaveid_to_heartbeats[request.slaveid] = heartbeats
         return masterslave_pb2.JoinResponse()
-    
+
+    # TODO: implementation ignores heartbeats from slaves that may have timed out from 3 missed heartbeats
+    # but were not actually dead; add mechanism that tells the slave to shut off if it was marked dead
     def Heartbeat(self, request, context):
-        heartbeats = slaveid_to_heartbeats[request.slaveid]
-        heartbeats.set_new_heartbeat()
+        if (request.slaveid in slaveid_to_heartbeats):
+            heartbeats = slaveid_to_heartbeats[request.slaveid]
+            heartbeats.set_new_heartbeat()
         return masterslave_pb2.HeartbeatResponse()
 
 def send_tasks_summary_to_log():
@@ -105,7 +116,8 @@ def handle_max_missed_heartbeats(slaveid):
         logger.emit(node_id,{"message":f"changing state of task {taskname} to killed"})
         db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
 
-
+# this function is invoked in a seperate thread
+# the Heartbeat class uses locks to ensure thread safety
 def check_missed_heartbeats():
     while True:
         time.sleep(HEARTBEAT_INTERVAL_IN_SECS)
