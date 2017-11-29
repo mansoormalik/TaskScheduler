@@ -5,6 +5,7 @@ import sys
 import masterslave_pb2
 import masterslave_pb2_grpc
 from fluent import sender
+from threading import Thread
 
 if (len(sys.argv) != 3):
     print("usage: python slave.py master_host slave_id")
@@ -14,6 +15,7 @@ node_id = sys.argv[2]
 
 #TODO: hardcoded values should be read from config file
 master_slave_port = 50051
+HEARTBEAT_INTERVAL_IN_SECS = 5
 POLLING_INTERVAL_NO_TASKS_IN_SECS = 3
 WAIT_AFTER_CONNECTION_FAILURE_IN_SECS = 5
 logger = sender.FluentSender("scheduler", "172.17.0.2", 24224)
@@ -25,10 +27,19 @@ response = None
 taskname = ""
 is_master_fail_during_task_exec = False
 
+def send_heartbeat_to_server():
+    global stub
+    while True:
+        stub.Heartbeat(masterslave_pb2.HeartbeatRequest(slaveid=node_id))
+        #logger.emit(node_id, {"message": "sending heartbeat to server"})
+        time.sleep(HEARTBEAT_INTERVAL_IN_SECS)
+
+        
 def start_task_execution_loop():
     global stub
     global taskname
     global is_master_fail_during_task_exec
+    Thread(target=send_heartbeat_to_server).start()
     while True:
         taskname = ""
         is_master_fail_during_task_exec = False
@@ -58,6 +69,7 @@ def try_server_connection():
         channel = grpc.insecure_channel(f"{master_host}:{master_slave_port}")
         stub = masterslave_pb2_grpc.TaskSchedulerStub(channel)
         stub.Acknowledge(masterslave_pb2.AcknowledgeRequest())
+        stub.Join(masterslave_pb2.JoinRequest(slaveid=node_id))
         return True
     except:
         return False

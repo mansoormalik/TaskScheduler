@@ -7,6 +7,7 @@ RUN python -m pip install fluent-logger
 
 COPY master.py /opt/scheduler/
 COPY masterslave_pb2.py /opt/scheduler/
-COPY masterslave_pb2_grpc.py /opt/scheduler
+COPY masterslave_pb2_grpc.py /opt/scheduler/
+COPY heartbeats.py /opt/scheduler/
 
 

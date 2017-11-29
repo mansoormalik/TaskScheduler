@@ -14,6 +14,16 @@ class TaskSchedulerStub(object):
     Args:
       channel: A grpc.Channel.
     """
+    self.Join = channel.unary_unary(
+        '/TaskScheduler/Join',
+        request_serializer=masterslave__pb2.JoinRequest.SerializeToString,
+        response_deserializer=masterslave__pb2.JoinResponse.FromString,
+        )
+    self.Heartbeat = channel.unary_unary(
+        '/TaskScheduler/Heartbeat',
+        request_serializer=masterslave__pb2.HeartbeatRequest.SerializeToString,
+        response_deserializer=masterslave__pb2.HeartbeatResponse.FromString,
+        )
     self.Task = channel.unary_unary(
         '/TaskScheduler/Task',
         request_serializer=masterslave__pb2.TaskRequest.SerializeToString,
@@ -39,6 +49,20 @@ class TaskSchedulerStub(object):
 class TaskSchedulerServicer(object):
   # missing associated documentation comment in .proto file
   pass
+
+  def Join(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def Heartbeat(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
 
   def Task(self, request, context):
     # missing associated documentation comment in .proto file
@@ -71,6 +95,16 @@ class TaskSchedulerServicer(object):
 
 def add_TaskSchedulerServicer_to_server(servicer, server):
   rpc_method_handlers = {
+      'Join': grpc.unary_unary_rpc_method_handler(
+          servicer.Join,
+          request_deserializer=masterslave__pb2.JoinRequest.FromString,
+          response_serializer=masterslave__pb2.JoinResponse.SerializeToString,
+      ),
+      'Heartbeat': grpc.unary_unary_rpc_method_handler(
+          servicer.Heartbeat,
+          request_deserializer=masterslave__pb2.HeartbeatRequest.FromString,
+          response_serializer=masterslave__pb2.HeartbeatResponse.SerializeToString,
+      ),
       'Task': grpc.unary_unary_rpc_method_handler(
           servicer.Task,
           request_deserializer=masterslave__pb2.TaskRequest.FromString,

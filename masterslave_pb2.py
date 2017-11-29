@@ -19,10 +19,120 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='masterslave.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x11masterslave.proto\"\x1e\n\x0bTaskRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\"3\n\x0cTaskResponse\x12\x10\n\x08taskname\x18\x01 \x01(\t\x12\x11\n\tsleeptime\x18\x02 \x01(\x05\"2\n\rStatusRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\x12\x10\n\x08taskname\x18\x02 \x01(\t\"\x10\n\x0eStatusResponse\">\n\x19\x41\x66terMasterFailureRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\x12\x10\n\x08taskname\x18\x02 \x01(\t\"\x1c\n\x1a\x41\x66terMasterFailureResponse\"\x14\n\x12\x41\x63knowledgeRequest\"\x15\n\x13\x41\x63knowledgeResponse2\xf0\x01\n\rTaskScheduler\x12%\n\x04Task\x12\x0c.TaskRequest\x1a\r.TaskResponse\"\x00\x12+\n\x06Status\x12\x0e.StatusRequest\x1a\x0f.StatusResponse\"\x00\x12O\n\x12\x41\x66terMasterFailure\x12\x1a.AfterMasterFailureRequest\x1a\x1b.AfterMasterFailureResponse\"\x00\x12:\n\x0b\x41\x63knowledge\x12\x13.AcknowledgeRequest\x1a\x14.AcknowledgeResponse\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x11masterslave.proto\"\x1e\n\x0bJoinRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\"\x0e\n\x0cJoinResponse\"#\n\x10HeartbeatRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\"\x13\n\x11HeartbeatResponse\"\x1e\n\x0bTaskRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\"3\n\x0cTaskResponse\x12\x10\n\x08taskname\x18\x01 \x01(\t\x12\x11\n\tsleeptime\x18\x02 \x01(\x05\"2\n\rStatusRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\x12\x10\n\x08taskname\x18\x02 \x01(\t\"\x10\n\x0eStatusResponse\">\n\x19\x41\x66terMasterFailureRequest\x12\x0f\n\x07slaveid\x18\x01 \x01(\t\x12\x10\n\x08taskname\x18\x02 \x01(\t\"\x1c\n\x1a\x41\x66terMasterFailureResponse\"\x14\n\x12\x41\x63knowledgeRequest\"\x15\n\x13\x41\x63knowledgeResponse2\xcd\x02\n\rTaskScheduler\x12%\n\x04Join\x12\x0c.JoinRequest\x1a\r.JoinResponse\"\x00\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x12%\n\x04Task\x12\x0c.TaskRequest\x1a\r.TaskResponse\"\x00\x12+\n\x06Status\x12\x0e.StatusRequest\x1a\x0f.StatusResponse\"\x00\x12O\n\x12\x41\x66terMasterFailure\x12\x1a.AfterMasterFailureRequest\x1a\x1b.AfterMasterFailureResponse\"\x00\x12:\n\x0b\x41\x63knowledge\x12\x13.AcknowledgeRequest\x1a\x14.AcknowledgeResponse\"\x00\x62\x06proto3')
 )
 
 
+
+
+_JOINREQUEST = _descriptor.Descriptor(
+  name='JoinRequest',
+  full_name='JoinRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='slaveid', full_name='JoinRequest.slaveid', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=21,
+  serialized_end=51,
+)
+
+
+_JOINRESPONSE = _descriptor.Descriptor(
+  name='JoinResponse',
+  full_name='JoinResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=53,
+  serialized_end=67,
+)
+
+
+_HEARTBEATREQUEST = _descriptor.Descriptor(
+  name='HeartbeatRequest',
+  full_name='HeartbeatRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='slaveid', full_name='HeartbeatRequest.slaveid', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=69,
+  serialized_end=104,
+)
+
+
+_HEARTBEATRESPONSE = _descriptor.Descriptor(
+  name='HeartbeatResponse',
+  full_name='HeartbeatResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=106,
+  serialized_end=125,
+)
 
 
 _TASKREQUEST = _descriptor.Descriptor(
@@ -51,8 +161,8 @@ _TASKREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=21,
-  serialized_end=51,
+  serialized_start=127,
+  serialized_end=157,
 )
 
 
@@ -89,8 +199,8 @@ _TASKRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=53,
-  serialized_end=104,
+  serialized_start=159,
+  serialized_end=210,
 )
 
 
@@ -127,8 +237,8 @@ _STATUSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=106,
-  serialized_end=156,
+  serialized_start=212,
+  serialized_end=262,
 )
 
 
@@ -151,8 +261,8 @@ _STATUSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=158,
-  serialized_end=174,
+  serialized_start=264,
+  serialized_end=280,
 )
 
 
@@ -189,8 +299,8 @@ _AFTERMASTERFAILUREREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=176,
-  serialized_end=238,
+  serialized_start=282,
+  serialized_end=344,
 )
 
 
@@ -213,8 +323,8 @@ _AFTERMASTERFAILURERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=240,
-  serialized_end=268,
+  serialized_start=346,
+  serialized_end=374,
 )
 
 
@@ -237,8 +347,8 @@ _ACKNOWLEDGEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=270,
-  serialized_end=290,
+  serialized_start=376,
+  serialized_end=396,
 )
 
 
@@ -261,10 +371,14 @@ _ACKNOWLEDGERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=292,
-  serialized_end=313,
+  serialized_start=398,
+  serialized_end=419,
 )
 
+DESCRIPTOR.message_types_by_name['JoinRequest'] = _JOINREQUEST
+DESCRIPTOR.message_types_by_name['JoinResponse'] = _JOINRESPONSE
+DESCRIPTOR.message_types_by_name['HeartbeatRequest'] = _HEARTBEATREQUEST
+DESCRIPTOR.message_types_by_name['HeartbeatResponse'] = _HEARTBEATRESPONSE
 DESCRIPTOR.message_types_by_name['TaskRequest'] = _TASKREQUEST
 DESCRIPTOR.message_types_by_name['TaskResponse'] = _TASKRESPONSE
 DESCRIPTOR.message_types_by_name['StatusRequest'] = _STATUSREQUEST
@@ -274,6 +388,34 @@ DESCRIPTOR.message_types_by_name['AfterMasterFailureResponse'] = _AFTERMASTERFAI
 DESCRIPTOR.message_types_by_name['AcknowledgeRequest'] = _ACKNOWLEDGEREQUEST
 DESCRIPTOR.message_types_by_name['AcknowledgeResponse'] = _ACKNOWLEDGERESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+JoinRequest = _reflection.GeneratedProtocolMessageType('JoinRequest', (_message.Message,), dict(
+  DESCRIPTOR = _JOINREQUEST,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:JoinRequest)
+  ))
+_sym_db.RegisterMessage(JoinRequest)
+
+JoinResponse = _reflection.GeneratedProtocolMessageType('JoinResponse', (_message.Message,), dict(
+  DESCRIPTOR = _JOINRESPONSE,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:JoinResponse)
+  ))
+_sym_db.RegisterMessage(JoinResponse)
+
+HeartbeatRequest = _reflection.GeneratedProtocolMessageType('HeartbeatRequest', (_message.Message,), dict(
+  DESCRIPTOR = _HEARTBEATREQUEST,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:HeartbeatRequest)
+  ))
+_sym_db.RegisterMessage(HeartbeatRequest)
+
+HeartbeatResponse = _reflection.GeneratedProtocolMessageType('HeartbeatResponse', (_message.Message,), dict(
+  DESCRIPTOR = _HEARTBEATRESPONSE,
+  __module__ = 'masterslave_pb2'
+  # @@protoc_insertion_point(class_scope:HeartbeatResponse)
+  ))
+_sym_db.RegisterMessage(HeartbeatResponse)
 
 TaskRequest = _reflection.GeneratedProtocolMessageType('TaskRequest', (_message.Message,), dict(
   DESCRIPTOR = _TASKREQUEST,
@@ -339,13 +481,31 @@ _TASKSCHEDULER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=316,
-  serialized_end=556,
+  serialized_start=422,
+  serialized_end=755,
   methods=[
+  _descriptor.MethodDescriptor(
+    name='Join',
+    full_name='TaskScheduler.Join',
+    index=0,
+    containing_service=None,
+    input_type=_JOINREQUEST,
+    output_type=_JOINRESPONSE,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='Heartbeat',
+    full_name='TaskScheduler.Heartbeat',
+    index=1,
+    containing_service=None,
+    input_type=_HEARTBEATREQUEST,
+    output_type=_HEARTBEATRESPONSE,
+    options=None,
+  ),
   _descriptor.MethodDescriptor(
     name='Task',
     full_name='TaskScheduler.Task',
-    index=0,
+    index=2,
     containing_service=None,
     input_type=_TASKREQUEST,
     output_type=_TASKRESPONSE,
@@ -354,7 +514,7 @@ _TASKSCHEDULER = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='Status',
     full_name='TaskScheduler.Status',
-    index=1,
+    index=3,
     containing_service=None,
     input_type=_STATUSREQUEST,
     output_type=_STATUSRESPONSE,
@@ -363,7 +523,7 @@ _TASKSCHEDULER = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='AfterMasterFailure',
     full_name='TaskScheduler.AfterMasterFailure',
-    index=2,
+    index=4,
     containing_service=None,
     input_type=_AFTERMASTERFAILUREREQUEST,
     output_type=_AFTERMASTERFAILURERESPONSE,
@@ -372,7 +532,7 @@ _TASKSCHEDULER = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='Acknowledge',
     full_name='TaskScheduler.Acknowledge',
-    index=3,
+    index=5,
     containing_service=None,
     input_type=_ACKNOWLEDGEREQUEST,
     output_type=_ACKNOWLEDGERESPONSE,

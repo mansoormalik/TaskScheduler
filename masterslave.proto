@@ -1,10 +1,26 @@
 syntax = "proto3";
 
 service TaskScheduler {
+  rpc Join(JoinRequest) returns (JoinResponse) {}
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {}
   rpc Task(TaskRequest) returns (TaskResponse) {}
   rpc Status(StatusRequest) returns (StatusResponse) {}
   rpc AfterMasterFailure(AfterMasterFailureRequest) returns (AfterMasterFailureResponse) {}
   rpc Acknowledge(AcknowledgeRequest) returns (AcknowledgeResponse) {}
+}
+
+message JoinRequest {
+  string slaveid = 1;
+}
+
+message JoinResponse {
+}
+
+message HeartbeatRequest {
+  string slaveid = 1;	
+}
+
+message HeartbeatResponse {
 }
 
 message TaskRequest {

@@ -10,6 +10,8 @@ from pymongo import MongoClient
 from concurrent import futures
 from collections import deque
 from fluent import sender
+from heartbeats import Heartbeats
+from threading import Thread
 
 if (len(sys.argv) != 3):
     print("usage: python master.py mongo_host mongo_port")
@@ -21,16 +23,22 @@ node_id = "master"
 
 #TODO: hardcoded values should be read from config file
 master_slave_port = 50051
+HEARTBEAT_INTERVAL_IN_SECS = 5
+MAX_MISSED_HEARTBEATS = 3
+CHECK_TASKS_INTERVAL_IN_SECS = 10
 logger = sender.FluentSender("scheduler", "172.17.0.2", 24224)
 logger.emit(node_id,{"message":"master is starting"})
-
-CHECK_TASKS_INTERVAL_IN_SECS = 10
 client = MongoClient(mongo_host, mongo_port)
 db = client['scheduler']
+
 # a queue of unassigned_tasks (state:{created,killed})
 unassigned_tasks = deque()
+
 # a dictonary used by the master for looking up tasks by tasknames
 taskname_to_task = {}
+
+# a dictionary used by the master to track heartbeats from slaves
+slaveid_to_heartbeats = {}
 
 # TODO: the current implementation does not use locks
 #       documentation from google is sparse on gRCP and need more time to better understand how library
@@ -69,6 +77,52 @@ class Master(masterslave_pb2_grpc.TaskSchedulerServicer):
         logger.emit(node_id, {"message":f"setting {request.taskname} to success after master failure"})        
         return masterslave_pb2.AfterMasterFailureResponse()
 
+    def Join(self, request, context):
+        heartbeats = Heartbeats()
+        slaveid_to_heartbeats[request.slaveid] = heartbeats
+        return masterslave_pb2.JoinResponse()
+    
+    def Heartbeat(self, request, context):
+        heartbeats = slaveid_to_heartbeats[request.slaveid]
+        heartbeats.set_new_heartbeat()
+        return masterslave_pb2.HeartbeatResponse()
+
+def send_tasks_summary_to_log():
+    created = db.tasks.count({"state":"created"})
+    running = db.tasks.count({"state":"running"})
+    killed = db.tasks.count({"state":"killed"})
+    success = db.tasks.count({"state":"success"})
+    logger.emit(node_id,{"message":"tasks summary", "created":f"{created}",
+                         "running":f"{running}", "killed":f"{killed}",
+                         "success":f"{success}"})
+    
+def handle_max_missed_heartbeats(slaveid):
+    for task in db.tasks.find({"host": slaveid, "state": "running"}):
+        id = task['_id']
+        taskname = task['taskname']
+        task['state'] = "killed"
+        logger.emit(node_id,{"message":f"task {taskname} assigned to {slaveid} is in running state"})
+        logger.emit(node_id,{"message":f"changing state of task {taskname} to killed"})
+        db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
+
+
+def check_missed_heartbeats():
+    while True:
+        time.sleep(HEARTBEAT_INTERVAL_IN_SECS)
+        now = time.time()
+        dead = []
+        for slaveid, heartbeats in slaveid_to_heartbeats.items():
+            if (now > heartbeats.get_last_heartbeat() + HEARTBEAT_INTERVAL_IN_SECS):
+                heartbeats.add_missed_heartbeat()
+            if (heartbeats.get_missed_consec_heartbeats() >= MAX_MISSED_HEARTBEATS):
+                msg = f"missed {MAX_MISSED_HEARTBEATS} consecutive heartbeats from {slaveid}"
+                logger.emit(node_id, {"message": msg})
+                handle_max_missed_heartbeats(slaveid)
+                send_tasks_summary_to_log()
+                dead.append(slaveid)
+        for slaveid in dead:
+            del slaveid_to_heartbeats[slaveid]
+    
 def obtain_unassigned_tasks():
     for task in db.tasks.find({"state":"created"}):
         taskname = task['taskname']
@@ -93,6 +147,7 @@ def serve():
     masterslave_pb2_grpc.add_TaskSchedulerServicer_to_server(Master(), server)
     server.add_insecure_port(f"[::]:{master_slave_port}")
     server.start()
+    Thread(target=check_missed_heartbeats).start()
     try:
         while True:
             time.sleep(CHECK_TASKS_INTERVAL_IN_SECS)

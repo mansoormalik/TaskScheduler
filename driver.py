@@ -24,7 +24,7 @@ db = None
 logger = sender.FluentSender("scheduler", "172.17.0.2", 24224)
 logger.emit(node_id,{"message":"driver is starting"})
 
-def run_mongodb_container():
+def start_mongodb_container():
     global mongo_container
     global mongo_host
     global mongo_client
@@ -33,45 +33,69 @@ def run_mongodb_container():
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     mongo_container = check_output(cmd, shell=True).strip().decode()
-    logger.emit(node_id,{"message":"launched mongod container",
+    logger.emit(node_id,{"message":"started mongod container",
                          "container_id":f"{mongo_container}"})
     cmd = "sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + mongo_container
     mongo_host = check_output(cmd, shell=True).strip().decode()
     mongo_client = MongoClient(mongo_host, mongo_port)
     db = mongo_client['scheduler']
 
-def run_task_generator():
+def stop_mongodb_container():
+    global mongo_container
+    cmd = f"sudo docker stop {mongo_container}"
+    call(cmd, shell=True)
+    logger.emit(node_id,{"message": f"stopped mongo container {mongo_container}"})
+    
+def start_task_generator():
     cmd = f"python task_generator.py {mongo_host} {mongo_port}"
     check_output(cmd, shell=True)
+    logger.emit(node_id,{"message": "executed task_generator.py"})
 
-def run_master_container():
+def mongodb_tasks_snapshot(filename):
+    cmd = f"mongoexport --host {mongo_host} --db scheduler --collection tasks --out {filename}"
+    call(cmd, shell=True)
+    logger.emit(node_id,{"message": f"saved snapshot from scheduler.tasks collection to {filename}"})
+    
+def start_master_container():
     global master_container
     global master_host
     cmd = f"sudo docker run -d master python /opt/scheduler/master.py {mongo_host} {mongo_port}"
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     master_container = check_output(cmd, shell=True).strip().decode()
-    logger.emit(node_id,{"message":"launched master container",
+    logger.emit(node_id,{"message":"started master container",
                          "container_id":f"{master_container}"})
     cmd = "sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' " + master_container
     master_host = check_output(cmd, shell=True).strip().decode()
 
-def run_slave_container():
+def stop_master_container():
+    global master_container
+    cmd = f"sudo docker stop {master_container}"
+    call(cmd, shell=True)
+    logger.emit(node_id,{"message": f"stopped master container {master_container}"})
+    
+def start_slave_container():
     global next_slave_idx
     cmd = f"sudo docker run -d slave python /opt/scheduler/slave.py {master_host} slave-{next_slave_idx}"
     call(cmd, shell=True)
     cmd = "sudo docker ps -l -q"
     container = check_output(cmd, shell=True).strip().decode()
-    logger.emit(node_id,{"message":f"launched slave-{next_slave_idx} container",
+    logger.emit(node_id,{"message":f"started slave-{next_slave_idx} container",
                          "container_id":f"{container}"})
     slave_idx_to_container[next_slave_idx] = container
     next_slave_idx += 1
 
     
-def run_slave_containers(num_containers):
+def start_slave_containers(num_containers):
     for idx in range(0, num_containers):
-        run_slave_container()
+        start_slave_container()
 
+def stop_slave_containers():
+    for idx, container in slave_idx_to_container.items():
+        cmd = f"sudo docker stop {container}"
+        call(cmd, shell=True)
+        logger.emit(node_id,{"message": f"stopped slave container {container}"})
+        
 def send_tasks_summary_to_log():
     created = db.tasks.count({"state":"created"})
     running = db.tasks.count({"state":"running"})
@@ -80,7 +104,16 @@ def send_tasks_summary_to_log():
     logger.emit(node_id,{"message":"tasks summary", "created":f"{created}",
                          "running":f"{running}", "killed":f"{killed}",
                          "success":f"{success}"})
+
+def is_task_queue_empty():
+    created = db.tasks.count({"state":"created"})
+    running = db.tasks.count({"state":"running"})
+    killed = db.tasks.count({"state":"killed"})
+    if (created == 0 and running == 0 and killed == 0):
+        return True
+    return False
         
+    
 def kill_random_slave_container():
     num_containers = len(slave_idx_to_container)
     counter = randint(0, num_containers-1)
@@ -91,12 +124,6 @@ def kill_random_slave_container():
             slave_idx_to_container.pop(idx)
             host = "slave-" + str(idx)
             logger.emit(node_id,{"message":f"killing {host}"})
-            for task in db.tasks.find({"host": host, "state": "running"}):
-                id = task['_id']
-                taskname = task['taskname']
-                task['state'] = "killed"
-                logger.emit(node_id,{"message":f"changing status of task {taskname} to killed"})
-                db.tasks.update_one({'_id':id}, {"$set":task}, upsert=False)
             return
         counter -= 1
 
@@ -106,30 +133,36 @@ def kill_master_container():
     call(cmd, shell=True)
 
 def restart_after_killing_master_container():
-    run_master_container()
+    start_master_container()
 
-def enter_testing_loop():
+def test_until_all_tasks_completed():
     counter = 0
-    while True:
+    while (not is_task_queue_empty()):
         if (counter % 4 == 0):
             kill_master_container()
             send_tasks_summary_to_log()
-            time.sleep(20)
+            time.sleep(30)
             restart_after_killing_master_container()
-            time.sleep(160)
+            time.sleep(90)
         else:
             kill_random_slave_container()
             send_tasks_summary_to_log()
-            time.sleep(20)
-            run_slave_container()
-            time.sleep(160)
+            time.sleep(30)
+            start_slave_container()
+            time.sleep(90)
         counter += 1    
 
 if __name__ == '__main__':
-    run_mongodb_container()
-    run_task_generator()
+    start_mongodb_container()
+    start_task_generator()
+    mongodb_tasks_snapshot("tasks-at-start.json")
     send_tasks_summary_to_log()
-    run_master_container()
-    run_slave_containers(MAX_SLAVE_CONTAINERS)
+    start_master_container()
+    start_slave_containers(MAX_SLAVE_CONTAINERS)
     time.sleep(60)
-    enter_testing_loop()
+    test_until_all_tasks_completed()
+    mongodb_tasks_snapshot("tasks-at-end.json")
+    send_tasks_summary_to_log()
+    stop_slave_containers()
+    stop_master_container()
+    stop_mongodb_container()
